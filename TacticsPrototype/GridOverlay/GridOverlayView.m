@@ -8,11 +8,14 @@
 
 #import "GridOverlayView.h"
 #import "GridOverlayDisplay.h"
+#import "BlockDrawingView.h"
 
 @interface GridOverlayView ()
 
 @property (nonatomic) CGSize gridDimensions;
 @property (nonatomic) CGFloat unitSize;
+
+@property (nonatomic) UIView *coordinatesView;
 
 @property (nonatomic, strong) GridOverlayDisplay *display;
 
@@ -29,6 +32,16 @@
         self.userInteractionEnabled = NO;
         self.gridDimensions = gridDimensions;
         self.unitSize = unitSize;
+        
+        __weak typeof(self) weakSelf = self;
+        BlockDrawingView *coordsView = [[BlockDrawingView alloc] initWithFrame:self.bounds];
+        coordsView.backgroundColor = [UIColor clearColor];
+        coordsView.userInteractionEnabled = NO;
+        coordsView.drawBlock = ^(CGRect rect) {
+            [weakSelf drawDebugCoordinates];
+        };
+        [self addSubview:coordsView];
+        self.coordinatesView = coordsView;
     }
     return self;
 }
@@ -36,6 +49,8 @@
 - (void)updateViewForDisplay:(GridOverlayDisplay *)display
 {
     self.display = display;
+    self.coordinatesView.hidden = !display.showCoordinates;
+    
     [self setNeedsDisplay];
 }
 
@@ -50,10 +65,6 @@
     }
     
     [self drawOverlayTilesInContext:context];
-    
-    if (self.display.showCoordinates) {
-        [self drawDebugCoordinatesInContext:context];
-    }
     
     CGContextRestoreGState(context);
 }
@@ -107,9 +118,12 @@
     }
 }
 
-- (void)drawDebugCoordinatesInContext:(CGContextRef)context
+- (void)drawDebugCoordinates
 {
-    CGFloat fontSize = 7;
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSaveGState(context);
+    
+    CGFloat fontSize = 9;
     UIFont *font = [UIFont fontWithName:@"Helvetica-Bold" size:fontSize];
     NSDictionary *fillAttrs = @{
         NSForegroundColorAttributeName: [UIColor whiteColor],
@@ -124,7 +138,7 @@
     for (int col=0; col<self.gridDimensions.width; col++) {
         for (int row=0; row<self.gridDimensions.height; row++) {
             NSString *coords = [NSString stringWithFormat:@"[%i %i]", col, row];
-            CGPoint point = (CGPoint){col*self.unitSize + 3, (row+1)*self.unitSize-10};
+            CGPoint point = (CGPoint){col*self.unitSize + 3, (row+1)*self.unitSize-13};
             
             // Draw outlined text.
             CGContextSetTextDrawingMode(context, kCGTextStroke);
@@ -136,7 +150,7 @@
         }
     }
     
-    
+    CGContextRestoreGState(context);
 }
 
 @end

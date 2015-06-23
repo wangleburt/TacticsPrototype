@@ -19,6 +19,7 @@
 		31493E5B1B38D93D002D4380 /* WorldLevel.m in Sources */ = {isa = PBXBuildFile; fileRef = 31493E5A1B38D93D002D4380 /* WorldLevel.m */; };
 		31493E611B38DA38002D4380 /* GridOverlayDisplay.m in Sources */ = {isa = PBXBuildFile; fileRef = 31493E5E1B38DA38002D4380 /* GridOverlayDisplay.m */; };
 		31493E621B38DA38002D4380 /* GridOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 31493E601B38DA38002D4380 /* GridOverlayView.m */; };
+		31493E661B39CDB5002D4380 /* BlockDrawingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 31493E651B39CDB5002D4380 /* BlockDrawingView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +57,8 @@
 		31493E5E1B38DA38002D4380 /* GridOverlayDisplay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GridOverlayDisplay.m; sourceTree = "<group>"; };
 		31493E5F1B38DA38002D4380 /* GridOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GridOverlayView.h; sourceTree = "<group>"; };
 		31493E601B38DA38002D4380 /* GridOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GridOverlayView.m; sourceTree = "<group>"; };
+		31493E641B39CDB5002D4380 /* BlockDrawingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockDrawingView.h; sourceTree = "<group>"; };
+		31493E651B39CDB5002D4380 /* BlockDrawingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BlockDrawingView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +108,8 @@
 				3111B1E91B3881F700F51534 /* WorldView.m */,
 				31493E531B38C577002D4380 /* PanelView.h */,
 				31493E541B38C577002D4380 /* PanelView.m */,
+				31493E641B39CDB5002D4380 /* BlockDrawingView.h */,
+				31493E651B39CDB5002D4380 /* BlockDrawingView.m */,
 				31493E5C1B38D9E8002D4380 /* GridOverlay */,
 				3111B1EE1B38862D00F51534 /* Model */,
 				3111B1CC1B387D3400F51534 /* Images.xcassets */,
@@ -270,6 +275,7 @@
 				3111B1C21B387D3400F51534 /* main.m in Sources */,
 				3111B1E71B3880A700F51534 /* WorldViewController.m in Sources */,
 				31493E621B38DA38002D4380 /* GridOverlayView.m in Sources */,
+				31493E661B39CDB5002D4380 /* BlockDrawingView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
