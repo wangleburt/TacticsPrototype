@@ -32,6 +32,7 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
     self = [super initWithFrame:frame];
     if (self) {
         self.backgroundColor = [UIColor redColor];
+        self.level = level;
         
         UIImageView *backgroundView = [[UIImageView alloc] initWithFrame:self.bounds];
         backgroundView.image = [UIImage imageNamed:level.mapImageFileName];
@@ -48,7 +49,7 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
 
 - (void)updateGridForState:(WorldState *)state
 {
-    GridOverlayDisplay *display = [state currentGridOverlayDisplay];
+    GridOverlayDisplay *display = [state currentGridOverlayDisplay];    
     [self.overlayView updateViewForDisplay:display];
 }
 

@@ -8,6 +8,7 @@
 
 #import "WorldState.h"
 #import "WorldLevel.h"
+#import "TerrainMap.h"
 
 #import "GridOverlayDisplay.h"
 
@@ -31,7 +32,20 @@
 - (GridOverlayDisplay *)currentGridOverlayDisplay
 {
     GridOverlayDisplay *display = [[GridOverlayDisplay alloc] initWithWorldState:self];
+    for (int i=0; i<self.level.levelSize.width; i++) {
+        for (int j=0; j<self.level.levelSize.height; j++) {
+            if (self.level.terrainTiles[i][j].blocked) {
+                display[i][j] = [GridOverlayTileDisplay redTile];
+            }
+        }
+    }
+    
     return display;
+}
+
+- (CGSize)gridDimensions
+{
+    return self.level.levelSize;
 }
 
 @end

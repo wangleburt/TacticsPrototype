@@ -9,10 +9,13 @@
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CGGeometry.h>
 
+@class TerrainMap;
+
 @interface WorldLevel : NSObject
 
 @property (nonatomic, readonly) CGSize levelSize;
 @property (nonatomic, strong, readonly) NSString *mapImageFileName;
+@property (nonatomic, strong, readonly) TerrainMap *terrainTiles;
 
 @end
 

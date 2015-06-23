@@ -9,6 +9,12 @@
 #import "GridOverlayDisplay.h"
 #import "WorldState.h"
 
+@interface GridOverlayTileDisplay ()
+
+@property (nonatomic, strong) NSString *type;
+
+@end
+
 @implementation GridOverlayTileDisplay
 
 static CGFloat blueColors[] = {
@@ -28,6 +34,7 @@ static CGFloat redColors[] = {
     dispatch_once(&onceToken, ^{
         emptyTile = [[GridOverlayTileDisplay alloc] init];
         emptyTile.gradientColors = nil;
+        emptyTile.type = @"empty";
     });
     
     return emptyTile;
@@ -40,6 +47,7 @@ static CGFloat redColors[] = {
     dispatch_once(&onceToken, ^{
         blueTile = [[GridOverlayTileDisplay alloc] init];
         blueTile.gradientColors = blueColors;
+        blueTile.type = @"blue";
     });
     
     return blueTile;
@@ -52,9 +60,15 @@ static CGFloat redColors[] = {
     dispatch_once(&onceToken, ^{
         redTile = [[GridOverlayTileDisplay alloc] init];
         redTile.gradientColors = redColors;
+        redTile.type = @"red";
     });
     
     return redTile;
+}
+
+- (NSString *)description
+{
+    return self.type;
 }
 
 @end
