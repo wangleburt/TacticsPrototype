@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  PanelView.h
 //  TacticsPrototype
 //
 //  Created by Chris Meill on 6/22/15.
@@ -8,8 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController
+@interface PanelView : UIView
 
+- (void)setIsIn:(BOOL)isIn animated:(BOOL)animated;
 
 @end
-
