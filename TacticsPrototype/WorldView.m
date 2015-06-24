@@ -28,6 +28,9 @@
 
 static CGFloat const kWorldGridUnitSize = 80.0f;
 
+#define spriteCenter(point) CGPointMake((0.5f+point.x)*kWorldGridUnitSize, \
+                                        (0.5f+point.y)*kWorldGridUnitSize)
+
 @implementation WorldView
 
 - (instancetype)initWithLevel:(WorldLevel *)level
@@ -44,19 +47,22 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
         [self addSubview:backgroundView];
         self.backgroundView = backgroundView;
         
+        GridOverlayView *overlayView = [[GridOverlayView alloc] initWithGridDimensions:level.levelSize unitSize:kWorldGridUnitSize];
+        [self addSubview:overlayView];
+        self.overlayView = overlayView;
+        
         UIView *spriteView = [[UIView alloc] initWithFrame:self.bounds];
         spriteView.backgroundColor = [UIColor clearColor];
         [self addSubview:spriteView];
         self.spriteView = spriteView;
         
-        GridOverlayView *overlayView = [[GridOverlayView alloc] initWithGridDimensions:level.levelSize unitSize:kWorldGridUnitSize];
-        [self addSubview:overlayView];
-        self.overlayView = overlayView;
-        
         self.sprites = [NSMutableDictionary dictionary];
     }
     return self;
 }
+
+//--------------------------------------------------------------------------------------
+#pragma mark - Sprites
 
 - (void)loadSpritesFromState:(WorldState *)state
 {
@@ -68,13 +74,67 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
         sprite.backgroundColor = [UIColor clearColor];
         sprite.contentMode = UIViewContentModeScaleAspectFit;
         sprite.image = [UIImage imageNamed:object.imageFileName];
-        CGRect frame = sprite.frame;
-        frame.origin = (CGPoint){object.position.x*kWorldGridUnitSize, object.position.y*kWorldGridUnitSize};
-        sprite.frame = frame;
+        sprite.center = spriteCenter(object.position);
         [self.sprites setObject:sprite forKey:object.key];
         [self.spriteView addSubview:sprite];
     }
 }
+
+- (void)updateDisplayPositionForWorldObject:(WorldObject *)object
+{
+    UIView *sprite = [self.sprites objectForKey:object.key];
+    sprite.center = spriteCenter(object.position);
+}
+
+- (void)animateAnnotatedMovementPath:(NSArray *)path forObject:(WorldObject *)object completion:(void (^)())completionBlock
+{
+    if (path.count == 0) {
+        completionBlock();
+        return;
+    }
+    
+    [self.overlayView setSelectorPosition:kNoSelectionPosition];
+    
+    UIView *sprite = [self.sprites objectForKey:object.key];
+    [self animateMovementPath:path forSprite:sprite completion:^{
+        [self.overlayView setSelectorPosition:[[path lastObject] worldPointValue]];
+        completionBlock();
+    }];
+}
+
+- (void)animateMovementPath:(NSArray *)path forObject:(WorldObject *)object completion:(void (^)())completionBlock
+{
+    if (path.count == 0) {
+        completionBlock();
+        return;
+    }
+
+    UIView *sprite = [self.sprites objectForKey:object.key];
+    [self animateMovementPath:path forSprite:sprite completion:completionBlock];
+}
+
+- (void)animateMovementPath:(NSArray *)path forSprite:(UIView *)sprite completion:(void (^)())completionBlock
+{
+    WorldPoint startPoint = [path[0] worldPointValue];
+    sprite.center = spriteCenter(startPoint);
+
+    if (path.count > 1) {
+        WorldPoint endPoint = [path[1] worldPointValue];
+        [UIView animateWithDuration:0.05 animations:^{
+            sprite.center = spriteCenter(endPoint);
+        } completion:^(BOOL finished) {
+            NSRange range = NSMakeRange(1, path.count - 1);
+            NSIndexSet *indexSet = [NSIndexSet indexSetWithIndexesInRange:range];
+            NSArray *remainingPath = [path objectsAtIndexes:indexSet];
+            [self animateMovementPath:remainingPath forSprite:sprite completion:completionBlock];
+        }];
+
+    } else {
+        completionBlock();
+    }
+}
+
+//--------------------------------------------------------------------------------------
 
 - (void)updateGridForState:(WorldState *)state
 {

@@ -30,8 +30,9 @@
 
 - (instancetype)initWithLevel:(WorldLevel *)level;
 
-- (GridOverlayDisplay *)currentGridOverlayDisplay;
+- (void)startPlayerTurn;
 
+- (GridOverlayDisplay *)currentGridOverlayDisplay;
 - (WorldObject *)objectAtPosition:(WorldPoint)position;
 
 @end

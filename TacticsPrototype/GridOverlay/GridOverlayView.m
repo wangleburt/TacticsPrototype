@@ -59,8 +59,13 @@
 {
     self.display = display;
     self.coordinatesView.hidden = !display.showCoordinates;
+    [self setSelectorPosition:display.selectionPosition];
     
-    WorldPoint selectorPosition = display.selectionPosition;
+    [self setNeedsDisplay];
+}
+
+- (void)setSelectorPosition:(WorldPoint)selectorPosition
+{
     if (WorldPointEqualToPoint(selectorPosition, kNoSelectionPosition)) {
         if (!self.selectorView.hidden) {
             [self stopSelectorAnimation];
@@ -75,8 +80,6 @@
                                    self.unitSize * (selectorPosition.y + 0.5)};
         self.selectorView.center = center;
     }
-    
-    [self setNeedsDisplay];
 }
 
 - (void)startSelectorAnimation

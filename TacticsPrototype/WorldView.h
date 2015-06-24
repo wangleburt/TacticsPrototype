@@ -11,6 +11,7 @@
 
 @class WorldLevel;
 @class WorldState;
+@class WorldObject;
 
 @interface WorldView : UIView
 
@@ -18,6 +19,11 @@
 - (void)loadSpritesFromState:(WorldState *)state;
 
 - (void)updateGridForState:(WorldState *)state;
+
+- (void)updateDisplayPositionForWorldObject:(WorldObject *)object;
+
+- (void)animateMovementPath:(NSArray *)path forObject:(WorldObject *)object completion:(void (^)())completionBlock;
+- (void)animateAnnotatedMovementPath:(NSArray *)path forObject:(WorldObject *)object completion:(void (^)())completionBlock;
 
 - (WorldPoint)gridPositionForTouchLocatoin:(CGPoint)touchLocation;
 

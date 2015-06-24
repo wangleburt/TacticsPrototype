@@ -14,6 +14,7 @@
 
 #import "WorldObject.h"
 #import "Character.h"
+#import "CharacterClass.h"
 #import "CharacterWorldOptions.h"
 
 @interface WorldState ()
@@ -66,6 +67,13 @@
         }
     }
     return nil;
+}
+
+- (void)startPlayerTurn
+{
+    for (Character *dude in self.playerCharacters) {
+        dude.movesRemaining = dude.characterClass.movement;
+    }
 }
 
 //-------------------------------------------------------------------------------------

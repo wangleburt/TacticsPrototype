@@ -9,6 +9,7 @@
 #import "GridOverlayDisplay.h"
 #import "WorldState.h"
 #import "WorldObject.h"
+#import "CharacterWorldOptions.h"
 
 @interface GridOverlayTileDisplay ()
 
@@ -176,7 +177,9 @@ WorldPoint const kNoSelectionPosition = (WorldPoint){-1, -1};
 
 - (WorldPoint)selectionPosition
 {
-    if (self.worldState.selectedObject) {
+    if (self.worldState.characterWorldOptions.selectedMoveOption) {
+        return self.worldState.characterWorldOptions.selectedMoveOption.position;
+    } else if (self.worldState.selectedObject) {
         return self.worldState.selectedObject.position;
     } else {
         return kNoSelectionPosition;

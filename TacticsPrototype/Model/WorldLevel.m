@@ -70,6 +70,13 @@
     dude.key = @"foot1";
     [characters addObject:dude];
     
+    dude = [[Character alloc] init];
+    dude.characterClass = [ContentManager contentWithKey:@"class_footman"];
+    dude.position = (WorldPoint){4, 3};
+    dude.team = CharacterTeam_Player;
+    dude.key = @"foot2";
+    [characters addObject:dude];
+    
     level.characters = characters;
     
     return level;

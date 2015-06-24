@@ -21,9 +21,15 @@
 
 @interface CharacterWorldOptions : NSObject
 
+@property (nonatomic, strong, readonly) Character *character;
 @property (nonatomic, strong, readonly) NSArray *moveOptions;
 
+@property (nonatomic, strong) CharacterMovementOption *selectedMoveOption;
+
 - (instancetype)initWithCharacter:(Character *)character worldState:(WorldState *)worldState;
+
+- (BOOL)containsPoint:(WorldPoint)point;
+- (CharacterMovementOption *)moveOptionAtPoint:(WorldPoint)point;
 
 @end
 

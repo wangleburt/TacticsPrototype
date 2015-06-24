@@ -64,6 +64,7 @@
 
 - (void)startGame
 {
+    [self.worldState startPlayerTurn];
     self.tapRecognizer.enabled = YES;
 }
 
@@ -103,17 +104,61 @@
     CGPoint location = [tapRecognizer locationInView:self.worldView];
     WorldPoint position = [self.worldView gridPositionForTouchLocatoin:location];
     
+    if (self.worldState.characterWorldOptions &&
+        self.worldState.characterWorldOptions.character.team == CharacterTeam_Player &&
+        [self.worldState.characterWorldOptions containsPoint:position])
+    {
+        [self handleActionSelectionAtPosition:position];
+    }
+    
+    else {
+        [self handleObjectSelectionAtPosition:position];
+    }
+}
+
+- (void)handleActionSelectionAtPosition:(WorldPoint)position
+{
+    CharacterWorldOptions *options = self.worldState.characterWorldOptions;
+    CharacterMovementOption *moveOption = [options moveOptionAtPoint:position];
+    
+    // edge case: no available moves, essentially just a deselect
+    if (options.moveOptions.count == 1) {
+        [self cleanupSelection];
+        [self.worldView updateGridForState:self.worldState];
+    }
+    
+    // chose to commit the selected movement
+    else if ([moveOption isEqual:options.selectedMoveOption]) {
+        [self cleanupSelection];
+        [self.worldView updateGridForState:self.worldState];
+    }
+    
+    // chose a new move option
+    else {
+        self.worldState.characterWorldOptions.selectedMoveOption = moveOption;
+        self.worldScrollView.userInteractionEnabled = NO;
+        
+        [self.worldView animateAnnotatedMovementPath:moveOption.path forObject:options.character completion:^{
+            self.worldScrollView.userInteractionEnabled = YES;
+        }];
+    }
+}
+
+- (void)handleObjectSelectionAtPosition:(WorldPoint)position
+{
     WorldObject *selectedObject = [self.worldState objectAtPosition:position];
     
     // check deselection
     if (self.worldState.selectedObject && (!selectedObject || [selectedObject.key isEqualToString:self.worldState.selectedObject.key])) {
-        self.worldState.selectedObject = nil;
-        self.worldState.characterWorldOptions = nil;
+        [self cleanupSelection];
         [self.worldView updateGridForState:self.worldState];
     }
     
     // check new selection
-    else if (selectedObject && ![selectedObject.key isEqualToString:self.worldState.selectedObject.key]) {
+    else if (selectedObject && ![selectedObject.key isEqualToString:self.worldState.selectedObject.key])
+    {
+        [self cleanupSelection];
+        
         self.worldState.selectedObject = selectedObject;
         if ([selectedObject isKindOfClass:Character.class]) {
             Character *dude = (Character *)selectedObject;
@@ -125,6 +170,20 @@
         
         [self.worldView updateGridForState:self.worldState];
     }
+}
+
+- (void)cleanupSelection
+{
+    if (self.worldState.selectedObject) {
+        CharacterWorldOptions *options = self.worldState.characterWorldOptions;
+        CharacterMovementOption *moveOption = options.selectedMoveOption;
+        if (moveOption) {
+            options.character.position = moveOption.position;
+            options.character.movesRemaining -= moveOption.path.count-1;
+        }
+    }
+    self.worldState.selectedObject = nil;
+    self.worldState.characterWorldOptions = nil;
 }
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView

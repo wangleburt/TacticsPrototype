@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "WorldPoint.h"
 
 @class GridOverlayDisplay;
 
@@ -15,5 +16,7 @@
 - (instancetype)initWithGridDimensions:(CGSize)gridDimensions unitSize:(CGFloat)unitSize;
 
 - (void)updateViewForDisplay:(GridOverlayDisplay *)display;
+
+- (void)setSelectorPosition:(WorldPoint)selectorPosition;
 
 @end

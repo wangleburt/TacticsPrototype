@@ -8,7 +8,6 @@
 
 #import "CharacterWorldOptions.h"
 #import "Character.h"
-#import "CharacterClass.h"
 
 #import "WorldState.h"
 #import "WorldLevel.h"
@@ -21,6 +20,12 @@
 @property (nonatomic, strong) NSArray *moveOptions;
 
 @end
+
+typedef enum {
+    MoveValidity_Valid,
+    MoveValidity_PassThrough,
+    MoveValidity_Blocked
+} MoveValidity;
 
 @implementation CharacterWorldOptions
 
@@ -52,14 +57,14 @@
     root.position = self.character.position;
     root.path = [NSArray arrayWithObject:[NSValue valueWithWorldPoint:root.position]];
     checkedTiles[root.position.x][root.position.y] = YES;
-    [queue addObject:root];
+    if (self.character.movesRemaining > 0) {
+        [queue addObject:root];
+    }
     [options addObject:root];
  
     while (queue.count > 0) {
         CharacterMovementOption *current = queue[0];
         [queue removeObjectAtIndex:0];
-        
-        BOOL isFinal = (current.path.count >= self.character.characterClass.movement);
         
         // check up
         WorldPoint upp = (WorldPoint){current.position.x, current.position.y-1};
@@ -73,41 +78,92 @@
             if (checkedTiles[point.x][point.y]) {
                 continue;
             }
-            if ([self isValidMovementPoint:point worldState:worldState final:isFinal]) {
+            MoveValidity validity = [self moveValidityForPoint:point worldState:worldState];
+            if (validity != MoveValidity_Blocked) {
                 CharacterMovementOption *newOption = [[CharacterMovementOption alloc] init];
                 newOption.position = point;
                 NSMutableArray *path = [NSMutableArray arrayWithArray:current.path];
                 [path addObject:[NSValue valueWithWorldPoint:point]];
                 newOption.path = path;
                 checkedTiles[point.x][point.y] = YES;
-                if (path.count < self.character.characterClass.movement+1) {
+                if (path.count < self.character.movesRemaining+1) {
                     [queue addObject:newOption];
                 }
-                [options addObject:newOption];
+                if (validity == MoveValidity_Valid) {
+                    [options addObject:newOption];
+                }
             }
         }
     }
     self.moveOptions = options;
 }
 
-- (BOOL)isValidMovementPoint:(WorldPoint)point worldState:(WorldState *)worldState final:(BOOL)isFinalPosition
+- (MoveValidity)moveValidityForPoint:(WorldPoint)point worldState:(WorldState *)worldState
 {
     if (point.x < 0 || point.x >= worldState.gridDimensions.width) {
-        return NO;
+        return MoveValidity_Blocked;
     }
     if (point.y < 0 || point.y >= worldState.gridDimensions.width) {
-        return NO;
+        return MoveValidity_Blocked;
     }
     if (worldState.level.terrainTiles[point.x][point.y].blocked) {
-        return NO;
+        return MoveValidity_Blocked;
     }
     
-    // TODO: check if another unit is in that tile
+    WorldObject *object = [worldState objectAtPosition:point];
+    if (object) {
+        if ([object isKindOfClass:Character.class]) {
+            Character *otherCharacter = (Character *)object;
+            if (otherCharacter.team == self.character.team) {
+                return MoveValidity_PassThrough;
+            } else {
+                return MoveValidity_Blocked;
+            }
+        }
+    }
     
-    return YES;
+    return MoveValidity_Valid;
+}
+
+- (BOOL)containsPoint:(WorldPoint)point
+{
+    for (CharacterMovementOption *option in self.moveOptions) {
+        if (WorldPointEqualToPoint(point, option.position)) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (CharacterMovementOption *)moveOptionAtPoint:(WorldPoint)point
+{
+    for (CharacterMovementOption *option in self.moveOptions) {
+        if (WorldPointEqualToPoint(point, option.position)) {
+            return option;
+        }
+    }
+    return nil;
 }
 
 @end
 
 @implementation CharacterMovementOption
+
+- (BOOL)isEqual:(id)object
+{
+    if (object == self) {
+        return YES;
+    }
+    if (![object isKindOfClass:self.class]) {
+        return NO;
+    }
+    
+    CharacterMovementOption *otherOption = (CharacterMovementOption *)object;
+    if (WorldPointEqualToPoint(self.position, otherOption.position)) {
+        return YES;
+    }
+    
+    return NO;
+}
+
 @end

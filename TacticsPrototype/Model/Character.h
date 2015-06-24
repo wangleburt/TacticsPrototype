@@ -17,6 +17,8 @@ typedef enum {
 
 @interface Character : WorldObject
 
+@property (nonatomic) NSUInteger movesRemaining;
+
 @property (nonatomic, strong) CharacterClass *characterClass;
 @property (nonatomic) CharacterTeam team;
 
