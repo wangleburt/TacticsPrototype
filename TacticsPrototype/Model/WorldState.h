@@ -10,6 +10,7 @@
 #import <CoreGraphics/CGGeometry.h>
 
 @class WorldLevel;
+@class WorldObject;
 @class GridOverlayDisplay;
 
 @interface WorldState : NSObject
@@ -18,8 +19,13 @@
 @property (nonatomic) BOOL gridCoordsEnabled;
 @property (nonatomic) CGSize gridDimensions;
 
+@property (nonatomic, readonly) NSArray *worldObjects;
+@property (nonatomic, strong) WorldObject *selectedObject;
+
 - (instancetype)initWithLevel:(WorldLevel *)level;
 
 - (GridOverlayDisplay *)currentGridOverlayDisplay;
+
+- (WorldObject *)objectAtPosition:(CGPoint)position;
 
 @end

@@ -12,9 +12,14 @@
 
 #import "GridOverlayDisplay.h"
 
+#import "WorldObject.h"
+#import "Character.h"
+
 @interface WorldState ()
 
 @property (nonatomic, strong) WorldLevel *level;
+
+@property (nonatomic, strong) NSMutableArray *playerCharacters;
 
 @end
 
@@ -25,21 +30,49 @@
     self = [super init];
     if (self) {
         self.level = level;
+        
+        self.playerCharacters = [NSMutableArray array];
+        [self instantiateCharacterPrototypes];
     }
     return self;
 }
 
+//-------------------------------------------------------------------------------------
+#pragma mark - World Objects
+
+- (NSArray *)worldObjects
+{
+    NSMutableArray *worldObjects = [NSMutableArray array];
+    [worldObjects addObjectsFromArray:self.playerCharacters];
+    return worldObjects;
+}
+
+- (void)instantiateCharacterPrototypes
+{
+    for (Character *dude in self.level.characters) {
+        if (dude.team == CharacterTeam_Player) {
+            [self.playerCharacters addObject:dude];
+        }
+    }
+}
+
+- (WorldObject *)objectAtPosition:(CGPoint)position
+{
+    NSArray *objects = self.worldObjects;
+    for (WorldObject *object in objects) {
+        if (CGPointEqualToPoint(object.position, position)) {
+            return object;
+        }
+    }
+    return nil;
+}
+
+//-------------------------------------------------------------------------------------
+#pragma mark - Grid
+
 - (GridOverlayDisplay *)currentGridOverlayDisplay
 {
     GridOverlayDisplay *display = [[GridOverlayDisplay alloc] initWithWorldState:self];
-    for (int i=0; i<self.level.levelSize.width; i++) {
-        for (int j=0; j<self.level.levelSize.height; j++) {
-            if (self.level.terrainTiles[i][j].blocked) {
-                display[i][j] = [GridOverlayTileDisplay redTile];
-            }
-        }
-    }
-    
     return display;
 }
 

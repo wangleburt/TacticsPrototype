@@ -33,8 +33,12 @@
 @property (nonatomic, readonly) BOOL showGridLines;
 @property (nonatomic, readonly) BOOL showCoordinates;
 
+@property (nonatomic, readonly) CGPoint selectionPosition;
+
 - (instancetype)initWithWorldState:(WorldState *)worldState;
 
 - (GridOverlayDisplayArray *)objectAtIndexedSubscript:(NSUInteger)index;
 
 @end
+
+extern CGPoint const kNoSelectionPosition;

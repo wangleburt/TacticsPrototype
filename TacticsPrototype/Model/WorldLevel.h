@@ -16,6 +16,7 @@
 @property (nonatomic, readonly) CGSize levelSize;
 @property (nonatomic, strong, readonly) NSString *mapImageFileName;
 @property (nonatomic, strong, readonly) TerrainMap *terrainTiles;
+@property (nonatomic, strong, readonly) NSArray *characters;
 
 @end
 

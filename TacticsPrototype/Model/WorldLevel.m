@@ -9,11 +9,15 @@
 #import "WorldLevel.h"
 #import "TerrainMap.h"
 
+#import "ContentManager.h"
+#import "Character.h"
+
 @interface WorldLevel ()
 
 @property (nonatomic) CGSize levelSize;
 @property (nonatomic, strong) NSString *mapImageFileName;
 @property (nonatomic, strong) TerrainMap *terrainTiles;
+@property (nonatomic, strong) NSArray *characters;
 
 @end
 
@@ -57,6 +61,16 @@
             }
         }
     }
+    
+    NSMutableArray *characters = [NSMutableArray array];
+    Character *dude = [[Character alloc] init];
+    dude.characterClass = [ContentManager contentWithKey:@"class_footman"];
+    dude.position = CGPointMake(2, 2);
+    dude.team = CharacterTeam_Player;
+    dude.key = @"foot1";
+    [characters addObject:dude];
+    
+    level.characters = characters;
     
     return level;
 }

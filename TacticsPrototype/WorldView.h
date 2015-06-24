@@ -14,7 +14,10 @@
 @interface WorldView : UIView
 
 - (instancetype)initWithLevel:(WorldLevel *)level;
+- (void)loadSpritesFromState:(WorldState *)state;
 
 - (void)updateGridForState:(WorldState *)state;
+
+- (CGPoint)gridPositionForTouchLocatoin:(CGPoint)touchLocation;
 
 @end

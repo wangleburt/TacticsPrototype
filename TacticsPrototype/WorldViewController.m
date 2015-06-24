@@ -12,6 +12,7 @@
 
 #import "WorldState.h"
 #import "WorldLevel.h"
+#import "WorldObject.h"
 
 @interface WorldViewController () <UIScrollViewDelegate>
 
@@ -24,6 +25,8 @@
 @property (nonatomic, strong) PanelView *menuPanel;
 @property (nonatomic, strong) UIButton *gridLinesButton;
 @property (nonatomic, strong) UIButton *gridCoordsButton;
+
+@property (nonatomic, strong) UITapGestureRecognizer *tapRecognizer;
 
 @end
 
@@ -49,6 +52,21 @@
     self.worldState.gridLinesEnabled = YES;
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    [self startGame];
+}
+
+- (void)startGame
+{
+    self.tapRecognizer.enabled = YES;
+}
+
+//----------------------------------------------------------------------------------
+#pragma mark - World
+
 - (void)setupWorldView
 {
     UIScrollView *worldScrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
@@ -63,11 +81,52 @@
     
     WorldView *worldView = [[WorldView alloc] initWithLevel:self.worldLevel];
     [worldView updateGridForState:self.worldState];
+    [worldView loadSpritesFromState:self.worldState];
     self.worldView = worldView;
     
     [self.worldScrollView addSubview:worldView];
     self.worldScrollView.contentSize = worldView.frame.size;
+    
+    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(detectTap:)];
+    tapRecognizer.numberOfTouchesRequired = 1;
+    tapRecognizer.numberOfTapsRequired = 1;
+    [self.worldView addGestureRecognizer:tapRecognizer];
+    tapRecognizer.enabled = NO;
+    self.tapRecognizer = tapRecognizer;
 }
+
+- (void)detectTap:(UITapGestureRecognizer *)tapRecognizer
+{
+    CGPoint location = [tapRecognizer locationInView:self.worldView];
+    CGPoint position = [self.worldView gridPositionForTouchLocatoin:location];
+    
+    BOOL newSelection = NO;
+    WorldObject *selectedObject = [self.worldState objectAtPosition:position];
+    if (!selectedObject && self.worldState.selectedObject) {
+        newSelection = YES;
+    } else if (selectedObject && ![selectedObject.key isEqualToString:self.worldState.selectedObject.key]) {
+        newSelection = YES;
+    }
+    
+    if (newSelection) {
+        self.worldState.selectedObject = selectedObject;
+        [self.worldView updateGridForState:self.worldState];
+    }
+    
+    if (selectedObject) {
+        NSLog(@"Got tap: (%.0f, %.0f) - %@", position.x, position.y, selectedObject.key);
+    } else {
+        NSLog(@"Got tap: (%.0f, %.0f)", position.x, position.y);
+    }
+}
+
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
+{
+    return self.worldView;
+}
+
+//----------------------------------------------------------------------------------
+#pragma mark - Menu
 
 - (void)setupMenuPanel
 {
@@ -115,11 +174,6 @@
 
     NSString *title = self.worldState.gridLinesEnabled ? @"Hide Lines" : @"Show Lines";
     [self.gridLinesButton setTitle:title forState:UIControlStateNormal];
-}
-
-- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
-{
-    return self.worldView;
 }
 
 @end

@@ -16,6 +16,7 @@
 @property (nonatomic) CGFloat unitSize;
 
 @property (nonatomic) UIView *coordinatesView;
+@property (nonatomic) UIView *selectorView;
 
 @property (nonatomic, strong) GridOverlayDisplay *display;
 
@@ -42,6 +43,14 @@
         };
         [self addSubview:coordsView];
         self.coordinatesView = coordsView;
+        
+        CGRect selectorFrame = (CGRect){CGPointZero, unitSize, unitSize};
+        selectorFrame = CGRectInset(selectorFrame, -5, -5);
+        UIImageView *selectorView = [[UIImageView alloc] initWithFrame:selectorFrame];
+        selectorView.backgroundColor = [UIColor clearColor];
+        selectorView.image = [UIImage imageNamed:@"selector"];
+        [self addSubview:selectorView];
+        self.selectorView = selectorView;
     }
     return self;
 }
@@ -51,7 +60,41 @@
     self.display = display;
     self.coordinatesView.hidden = !display.showCoordinates;
     
+    CGPoint selectorPosition = display.selectionPosition;
+    if (CGPointEqualToPoint(selectorPosition, kNoSelectionPosition)) {
+        if (!self.selectorView.hidden) {
+            [self stopSelectorAnimation];
+            self.selectorView.hidden = YES;
+        }
+    } else {
+        if (self.selectorView.hidden) {
+            self.selectorView.hidden = NO;
+            [self startSelectorAnimation];
+        }
+        CGPoint center = (CGPoint){self.unitSize * (selectorPosition.x + 0.5),
+                                   self.unitSize * (selectorPosition.y + 0.5)};
+        self.selectorView.center = center;
+    }
+    
     [self setNeedsDisplay];
+}
+
+- (void)startSelectorAnimation
+{
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
+    animation.fromValue = @1.0;
+    animation.toValue = @1.1;
+    animation.duration = 0.3;
+    animation.repeatCount = HUGE_VAL;
+    animation.autoreverses = YES;
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+
+    [self.selectorView.layer addAnimation:animation forKey:@"selectorBounce"];
+}
+
+- (void)stopSelectorAnimation
+{
+    [self.selectorView.layer removeAnimationForKey:@"selectorBounce"];
 }
 
 - (void)drawRect:(CGRect)rect

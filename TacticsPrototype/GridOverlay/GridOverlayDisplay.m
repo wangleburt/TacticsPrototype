@@ -8,6 +8,7 @@
 
 #import "GridOverlayDisplay.h"
 #import "WorldState.h"
+#import "WorldObject.h"
 
 @interface GridOverlayTileDisplay ()
 
@@ -130,6 +131,8 @@ static CGFloat redColors[] = {
 
 @end
 
+CGPoint const kNoSelectionPosition = (CGPoint){-1, -1};
+
 @implementation GridOverlayDisplay
 
 - (instancetype)initWithWorldState:(WorldState *)worldState
@@ -169,6 +172,15 @@ static CGFloat redColors[] = {
 - (BOOL)showCoordinates
 {
     return self.worldState.gridCoordsEnabled;
+}
+
+- (CGPoint)selectionPosition
+{
+    if (self.worldState.selectedObject) {
+        return self.worldState.selectedObject.position;
+    } else {
+        return kNoSelectionPosition;
+    }
 }
 
 @end
