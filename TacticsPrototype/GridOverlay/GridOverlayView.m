@@ -60,8 +60,8 @@
     self.display = display;
     self.coordinatesView.hidden = !display.showCoordinates;
     
-    CGPoint selectorPosition = display.selectionPosition;
-    if (CGPointEqualToPoint(selectorPosition, kNoSelectionPosition)) {
+    WorldPoint selectorPosition = display.selectionPosition;
+    if (WorldPointEqualToPoint(selectorPosition, kNoSelectionPosition)) {
         if (!self.selectorView.hidden) {
             [self stopSelectorAnimation];
             self.selectorView.hidden = YES;

@@ -65,7 +65,7 @@
     NSMutableArray *characters = [NSMutableArray array];
     Character *dude = [[Character alloc] init];
     dude.characterClass = [ContentManager contentWithKey:@"class_footman"];
-    dude.position = CGPointMake(2, 2);
+    dude.position = (WorldPoint){2, 2};
     dude.team = CharacterTeam_Player;
     dude.key = @"foot1";
     [characters addObject:dude];

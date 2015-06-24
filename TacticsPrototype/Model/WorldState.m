@@ -14,6 +14,7 @@
 
 #import "WorldObject.h"
 #import "Character.h"
+#import "CharacterWorldOptions.h"
 
 @interface WorldState ()
 
@@ -56,11 +57,11 @@
     }
 }
 
-- (WorldObject *)objectAtPosition:(CGPoint)position
+- (WorldObject *)objectAtPosition:(WorldPoint)position
 {
     NSArray *objects = self.worldObjects;
     for (WorldObject *object in objects) {
-        if (CGPointEqualToPoint(object.position, position)) {
+        if (WorldPointEqualToPoint(object.position, position)) {
             return object;
         }
     }
@@ -73,6 +74,12 @@
 - (GridOverlayDisplay *)currentGridOverlayDisplay
 {
     GridOverlayDisplay *display = [[GridOverlayDisplay alloc] initWithWorldState:self];
+    if (self.characterWorldOptions) {
+        for (CharacterMovementOption *option in self.characterWorldOptions.moveOptions) {
+            display[option.position.x][option.position.y] = [GridOverlayTileDisplay blueTile];
+        }
+    }
+    
     return display;
 }
 

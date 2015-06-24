@@ -82,11 +82,11 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
     [self.overlayView updateViewForDisplay:display];
 }
 
-- (CGPoint)gridPositionForTouchLocatoin:(CGPoint)touchLocation
+- (WorldPoint)gridPositionForTouchLocatoin:(CGPoint)touchLocation
 {
     int touchX = floor(touchLocation.x / kWorldGridUnitSize);
     int touchY = floor(touchLocation.y / kWorldGridUnitSize);
-    return CGPointMake(touchX, touchY);
+    return (WorldPoint){touchX, touchY};
 }
 
 @end

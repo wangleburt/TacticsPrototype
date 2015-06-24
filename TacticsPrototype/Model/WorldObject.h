@@ -7,11 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <CoreGraphics/CGGeometry.h>
+#import "WorldPoint.h"
 
 @interface WorldObject : NSObject
 
-@property (nonatomic) CGPoint position;
+@property (nonatomic) WorldPoint position;
 @property (nonatomic, strong) NSString *key;
 @property (nonatomic, strong) NSString *imageFileName;
 

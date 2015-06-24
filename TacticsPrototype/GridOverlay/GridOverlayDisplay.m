@@ -19,8 +19,8 @@
 @implementation GridOverlayTileDisplay
 
 static CGFloat blueColors[] = {
-    0.0f, 0.0f, 0.8f, 0.4f,
-    0.2f, 0.2f, 1.0f, 0.4f
+    0.0f, 0.0f, 0.5f, 0.4f,
+    0.0f, 0.3f, 1.0f, 0.4f
 };
 
 static CGFloat redColors[] = {
@@ -131,7 +131,7 @@ static CGFloat redColors[] = {
 
 @end
 
-CGPoint const kNoSelectionPosition = (CGPoint){-1, -1};
+WorldPoint const kNoSelectionPosition = (WorldPoint){-1, -1};
 
 @implementation GridOverlayDisplay
 
@@ -174,7 +174,7 @@ CGPoint const kNoSelectionPosition = (CGPoint){-1, -1};
     return self.worldState.gridCoordsEnabled;
 }
 
-- (CGPoint)selectionPosition
+- (WorldPoint)selectionPosition
 {
     if (self.worldState.selectedObject) {
         return self.worldState.selectedObject.position;

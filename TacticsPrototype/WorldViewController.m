@@ -14,6 +14,9 @@
 #import "WorldLevel.h"
 #import "WorldObject.h"
 
+#import "Character.h"
+#import "CharacterWorldOptions.h"
+
 @interface WorldViewController () <UIScrollViewDelegate>
 
 @property (nonatomic, strong) WorldLevel *worldLevel;
@@ -98,25 +101,29 @@
 - (void)detectTap:(UITapGestureRecognizer *)tapRecognizer
 {
     CGPoint location = [tapRecognizer locationInView:self.worldView];
-    CGPoint position = [self.worldView gridPositionForTouchLocatoin:location];
+    WorldPoint position = [self.worldView gridPositionForTouchLocatoin:location];
     
-    BOOL newSelection = NO;
     WorldObject *selectedObject = [self.worldState objectAtPosition:position];
-    if (!selectedObject && self.worldState.selectedObject) {
-        newSelection = YES;
-    } else if (selectedObject && ![selectedObject.key isEqualToString:self.worldState.selectedObject.key]) {
-        newSelection = YES;
-    }
     
-    if (newSelection) {
-        self.worldState.selectedObject = selectedObject;
+    // check deselection
+    if (self.worldState.selectedObject && (!selectedObject || [selectedObject.key isEqualToString:self.worldState.selectedObject.key])) {
+        self.worldState.selectedObject = nil;
+        self.worldState.characterWorldOptions = nil;
         [self.worldView updateGridForState:self.worldState];
     }
     
-    if (selectedObject) {
-        NSLog(@"Got tap: (%.0f, %.0f) - %@", position.x, position.y, selectedObject.key);
-    } else {
-        NSLog(@"Got tap: (%.0f, %.0f)", position.x, position.y);
+    // check new selection
+    else if (selectedObject && ![selectedObject.key isEqualToString:self.worldState.selectedObject.key]) {
+        self.worldState.selectedObject = selectedObject;
+        if ([selectedObject isKindOfClass:Character.class]) {
+            Character *dude = (Character *)selectedObject;
+            CharacterWorldOptions *options = [[CharacterWorldOptions alloc] initWithCharacter:dude worldState:self.worldState];
+            self.worldState.characterWorldOptions = options;
+        } else {
+            self.worldState.characterWorldOptions = nil;
+        }
+        
+        [self.worldView updateGridForState:self.worldState];
     }
 }
 

@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "WorldPoint.h"
 
 @class WorldLevel;
 @class WorldState;
@@ -18,6 +19,6 @@
 
 - (void)updateGridForState:(WorldState *)state;
 
-- (CGPoint)gridPositionForTouchLocatoin:(CGPoint)touchLocation;
+- (WorldPoint)gridPositionForTouchLocatoin:(CGPoint)touchLocation;
 
 @end

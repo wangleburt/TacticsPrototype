@@ -65,7 +65,7 @@
 
 - (TerrainTile *)objectAtIndexedSubscript:(NSUInteger)index
 {
-    return (index < self.tiles.count) ? self.tiles[index] : [TerrainTile emptyTile];
+    return (index < self.tiles.count) ? self.tiles[index] : [TerrainTile blockedTile];
 }
 
 - (void)setObject:(TerrainTile *)object atIndexedSubscript:(NSUInteger)index

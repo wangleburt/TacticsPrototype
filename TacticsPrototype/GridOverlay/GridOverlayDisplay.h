@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CGGeometry.h>
+#import "WorldPoint.h"
 
 @interface GridOverlayTileDisplay : NSObject
 
@@ -33,7 +34,7 @@
 @property (nonatomic, readonly) BOOL showGridLines;
 @property (nonatomic, readonly) BOOL showCoordinates;
 
-@property (nonatomic, readonly) CGPoint selectionPosition;
+@property (nonatomic, readonly) WorldPoint selectionPosition;
 
 - (instancetype)initWithWorldState:(WorldState *)worldState;
 
@@ -41,4 +42,4 @@
 
 @end
 
-extern CGPoint const kNoSelectionPosition;
+extern WorldPoint const kNoSelectionPosition;
