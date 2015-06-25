@@ -21,6 +21,8 @@
 @property (nonatomic, strong) NSArray *moveOptions;
 @property (nonatomic, strong) NSArray *attackOptions;
 
+@property (nonatomic, strong) NSSet *pointsInMovementRange;
+
 @end
 
 typedef enum {
@@ -61,6 +63,7 @@ typedef enum {
     NSMutableArray *queue = [NSMutableArray array];
     NSMutableArray *moveOptions = [NSMutableArray array];
     NSMutableSet *attackOptions = [NSMutableSet set];
+    NSMutableSet *allMovePoints = [NSMutableSet set];
     
     CharacterMovementOption *root = [[CharacterMovementOption alloc] init];
     root.position = self.character.position;
@@ -73,6 +76,7 @@ typedef enum {
     while (queue.count > 0) {
         CharacterMovementOption *current = queue[0];
         [queue removeObjectAtIndex:0];
+        [allMovePoints addObject:[NSValue valueWithWorldPoint:current.position]];
         
         if (current.moveValidity == MoveValidity_Valid) {
             [self addAttackOptionsFromMove:current toSet:attackOptions forWorldState:worldState];
@@ -112,6 +116,7 @@ typedef enum {
     self.moveOptions = moveOptions;
     self.attackOptions = [self pruneAttacks:attackOptions];
     self.selectedMoveOption = root;
+    self.pointsInMovementRange = allMovePoints;
 }
 
 - (void)addAttackOptionsFromMove:(CharacterMovementOption *)moveOption toSet:(NSMutableSet *)attackOptions forWorldState:(WorldState *)worldState
@@ -224,6 +229,69 @@ typedef enum {
             return option;
         }
     }
+    return nil;
+}
+
+- (NSArray *)pathFromPoint:(WorldPoint)startPoint toPoint:(WorldPoint)endPoint
+{
+    NSMutableArray *partialPaths = [NSMutableArray array];
+    NSMutableSet *pointsConsidered = [NSMutableSet set];
+    
+    NSArray *root = [NSArray arrayWithObject:[NSValue valueWithWorldPoint:startPoint]];
+    [partialPaths addObject:root];
+    
+    int (^heuristic)(NSArray *) = ^int(NSArray *path) {
+        WorldPoint lastPoint = [[path lastObject] worldPointValue];
+        int range = abs(lastPoint.x - endPoint.x) + abs(lastPoint.y - endPoint.y);
+        return range + (int)path.count;
+    };
+    NSComparisonResult (^prioritySorter)(id, id) = ^NSComparisonResult(id obj1, id obj2) {
+        int value1 = heuristic(obj1);
+        int value2 = heuristic(obj2);
+        if (value1 > value2) {
+            return NSOrderedAscending;
+        } else if (value1 < value2) {
+            return NSOrderedDescending;
+        } else {
+            return NSOrderedSame;
+        }
+    };
+    
+    // A* search!
+    while (partialPaths.count > 0) {
+        [partialPaths sortUsingComparator:prioritySorter];
+        NSArray *path = [partialPaths lastObject];
+        [partialPaths removeLastObject];
+        
+        WorldPoint current = [[path lastObject] worldPointValue];
+        if ([pointsConsidered containsObject:[path lastObject]]) {
+            continue;
+        } else {
+            [pointsConsidered addObject:[path lastObject]];
+        }
+        
+        WorldPoint up = (WorldPoint){current.x, current.y-1};
+        WorldPoint down = (WorldPoint){current.x, current.y+1};
+        WorldPoint left = (WorldPoint){current.x-1, current.y};
+        WorldPoint right = (WorldPoint){current.x+1, current.y};
+        WorldPoint newPoints[4] = {up, down, left, right};
+        for (int i=0; i<4; i++) {
+            NSValue *nextPoint = [NSValue valueWithWorldPoint:newPoints[i]];
+            if (![pointsConsidered containsObject:nextPoint] &&
+                [self.pointsInMovementRange containsObject:nextPoint])
+            {
+                NSMutableArray *nextPath = [NSMutableArray arrayWithArray:path];
+                [nextPath addObject:nextPoint];
+                if (WorldPointEqualToPoint(newPoints[i], endPoint)) {
+                    return nextPath;
+                } else {
+                    [partialPaths addObject:nextPath];
+                }
+            }
+        }
+    }
+
+    // no path found? bummer :(
     return nil;
 }
 

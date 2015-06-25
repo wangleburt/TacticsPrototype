@@ -142,18 +142,18 @@
                     abs(currentPosition.y - target.position.y);
         CharacterClass *charClass = options.character.characterClass;
         if (range >= charClass.attackRangeMin && range <= charClass.attackRangeMax) {
-            [self handleAttack:attackOption];
+            [self presentAttackOption:attackOption onTarget:target];
         }
         
         else {
             [self handleMoveSelection:attackOption.moveOption withCompletion:^{
-                [self handleAttack:attackOption];
+                [self presentAttackOption:attackOption onTarget:target];
             }];
         }
     }
 }
 
-- (void)handleAttack:(CharacterAttackOption *)attack
+- (void)presentAttackOption:(CharacterAttackOption *)attack onTarget:(Character *)target
 {
     NSLog(@"ATTACK");
 }
@@ -182,10 +182,20 @@
     
     // chose a new move option
     else {
+        NSArray *animationPath = moveOption.path;
+        WorldPoint moveStart = [[options.selectedMoveOption.path lastObject] worldPointValue];
+        if (!WorldPointEqualToPoint(moveStart, options.character.position)) {
+            WorldPoint moveEnd = [[moveOption.path lastObject] worldPointValue];
+            NSArray *optimalPath = [options pathFromPoint:moveStart toPoint:moveEnd];
+            if (optimalPath) {
+                animationPath = optimalPath;
+            }
+        }
+        
         self.worldState.characterWorldOptions.selectedMoveOption = moveOption;
         self.worldScrollView.userInteractionEnabled = NO;
         
-        [self.worldView animateAnnotatedMovementPath:moveOption.path forObject:options.character completion:^{
+        [self.worldView animateMovementPath:animationPath withAnnotationPath:moveOption.path forObject:options.character completion:^{
             self.worldScrollView.userInteractionEnabled = YES;
             if (completionBlock) {
                 completionBlock();

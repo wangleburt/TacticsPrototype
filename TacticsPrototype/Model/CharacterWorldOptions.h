@@ -40,6 +40,8 @@
 - (CharacterMovementOption *)moveOptionAtPoint:(WorldPoint)point;
 - (CharacterAttackOption *)attackOptionAtPoint:(WorldPoint)point;
 
+- (NSArray *)pathFromPoint:(WorldPoint)startPoint toPoint:(WorldPoint)endPoint;
+
 @end
 
 

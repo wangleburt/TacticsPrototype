@@ -86,9 +86,9 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
     sprite.center = spriteCenter(object.position);
 }
 
-- (void)animateAnnotatedMovementPath:(NSArray *)path forObject:(WorldObject *)object completion:(void (^)())completionBlock
+- (void)animateMovementPath:(NSArray *)movementPath withAnnotationPath:(NSArray *)annotationPath forObject:(WorldObject *)object completion:(void (^)())completionBlock;
 {
-    if (path.count == 0) {
+    if (movementPath.count == 0) {
         if (completionBlock) {
             completionBlock();
         }
@@ -99,9 +99,9 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
     [self.overlayView cleanupMovementAnnotations];
     
     UIView *sprite = [self.sprites objectForKey:object.key];
-    [self animateMovementPath:path forSprite:sprite completion:^{
-        [self.overlayView setSelectorPosition:[[path lastObject] worldPointValue]];
-        [self.overlayView annotateMovementPath:path];
+    [self animateMovementPath:movementPath forSprite:sprite completion:^{
+        [self.overlayView setSelectorPosition:[[annotationPath lastObject] worldPointValue]];
+        [self.overlayView annotateMovementPath:annotationPath];
         if (completionBlock) {
             completionBlock();
         }
