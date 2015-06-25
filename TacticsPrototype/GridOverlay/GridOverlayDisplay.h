@@ -16,7 +16,9 @@
 
 + (GridOverlayTileDisplay *)emptyTile;
 + (GridOverlayTileDisplay *)blueTile;
++ (GridOverlayTileDisplay *)darkBlueTile;
 + (GridOverlayTileDisplay *)redTile;
++ (GridOverlayTileDisplay *)darkRedTile;
 
 @end
 

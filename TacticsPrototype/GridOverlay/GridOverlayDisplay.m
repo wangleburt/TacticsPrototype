@@ -29,6 +29,16 @@ static CGFloat redColors[] = {
     1.0f, 0.2f, 0.2f, 0.4f
 };
 
+static CGFloat darkBlueColors[] = {
+    0.0f, 0.0f, 0.2f, 0.4f,
+    0.0f, 0.0f, 0.5f, 0.4f
+};
+
+static CGFloat darkRedColors[] = {
+    0.3f, 0.0f, 0.0f, 0.4f,
+    0.8f, 0.0f, 0.0f, 0.4f
+};
+
 + (GridOverlayTileDisplay *)emptyTile
 {
     static GridOverlayTileDisplay *emptyTile;
@@ -55,6 +65,19 @@ static CGFloat redColors[] = {
     return blueTile;
 }
 
++ (GridOverlayTileDisplay *)darkBlueTile
+{
+    static GridOverlayTileDisplay *darkBlueTile;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        darkBlueTile = [[GridOverlayTileDisplay alloc] init];
+        darkBlueTile.gradientColors = darkBlueColors;
+        darkBlueTile.type = @"dark-blue";
+    });
+    
+    return darkBlueTile;
+}
+
 + (GridOverlayTileDisplay *)redTile
 {
     static GridOverlayTileDisplay *redTile;
@@ -66,6 +89,19 @@ static CGFloat redColors[] = {
     });
     
     return redTile;
+}
+
++ (GridOverlayTileDisplay *)darkRedTile
+{
+    static GridOverlayTileDisplay *darkRedTile;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        darkRedTile = [[GridOverlayTileDisplay alloc] init];
+        darkRedTile.gradientColors = darkRedColors;
+        darkRedTile.type = @"dark-red";
+    });
+    
+    return darkRedTile;
 }
 
 - (NSString *)description

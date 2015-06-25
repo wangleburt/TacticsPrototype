@@ -92,10 +92,18 @@
     GridOverlayDisplay *display = [[GridOverlayDisplay alloc] initWithWorldState:self];
     if (self.characterWorldOptions) {
         for (CharacterMovementOption *option in self.characterWorldOptions.moveOptions) {
-            display[option.position.x][option.position.y] = [GridOverlayTileDisplay blueTile];
+            if (self.characterWorldOptions.character.team == CharacterTeam_Player) {
+                display[option.position.x][option.position.y] = [GridOverlayTileDisplay blueTile];
+            } else {
+                display[option.position.x][option.position.y] = [GridOverlayTileDisplay darkBlueTile];
+            }
         }
         for (CharacterAttackOption *option in self.characterWorldOptions.attackOptions) {
-            display[option.position.x][option.position.y] = [GridOverlayTileDisplay redTile];
+            if (self.characterWorldOptions.character.team == CharacterTeam_Player) {
+                display[option.position.x][option.position.y] = [GridOverlayTileDisplay redTile];
+            } else {
+                display[option.position.x][option.position.y] = [GridOverlayTileDisplay darkRedTile];
+            }
         }
     }
     

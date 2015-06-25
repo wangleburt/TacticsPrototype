@@ -52,7 +52,7 @@
     self.worldLevel = [WorldLevel testLevel];
     
     self.worldState = [[WorldState alloc] initWithLevel:self.worldLevel];
-    self.worldState.gridCoordsEnabled = YES;
+    self.worldState.gridCoordsEnabled = NO;
     self.worldState.gridLinesEnabled = YES;
 }
 
