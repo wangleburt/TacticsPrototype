@@ -15,6 +15,7 @@
 #import "WorldObject.h"
 
 #import "Character.h"
+#import "CharacterClass.h"
 #import "CharacterWorldOptions.h"
 
 @interface WorldViewController () <UIScrollViewDelegate>
@@ -120,17 +121,63 @@
 {
     CharacterWorldOptions *options = self.worldState.characterWorldOptions;
     CharacterMovementOption *moveOption = [options moveOptionAtPoint:position];
+    if (moveOption) {
+        [self handleMoveSelection:moveOption withCompletion:nil];
+        return;
+    }
     
+    CharacterAttackOption *attackOption = [options attackOptionAtPoint:position];
+    WorldObject *attackedObject = [self.worldState objectAtPosition:position];
+    if (!attackedObject || ![attackedObject isKindOfClass:Character.class]) {
+        if (![attackOption.moveOption isEqual:options.selectedMoveOption]) {
+            [self handleMoveSelection:attackOption.moveOption withCompletion:nil];
+        }
+        return;
+    }
+    
+    Character *target = (Character *)attackedObject;
+    if (target.team == CharacterTeam_Enemy) {
+        WorldPoint currentPosition = options.selectedMoveOption.position;
+        int range = abs(currentPosition.x - target.position.x) +
+                    abs(currentPosition.y - target.position.y);
+        CharacterClass *charClass = options.character.characterClass;
+        if (range >= charClass.attackRangeMin && range <= charClass.attackRangeMax) {
+            [self handleAttack:attackOption];
+        }
+        
+        else {
+            [self handleMoveSelection:attackOption.moveOption withCompletion:^{
+                [self handleAttack:attackOption];
+            }];
+        }
+    }
+}
+
+- (void)handleAttack:(CharacterAttackOption *)attack
+{
+    NSLog(@"ATTACK");
+}
+
+- (void)handleMoveSelection:(CharacterMovementOption *)moveOption withCompletion:(void (^)())completionBlock
+{
+    CharacterWorldOptions *options = self.worldState.characterWorldOptions;
+
     // edge case: no available moves, essentially just a deselect
     if (options.moveOptions.count == 1) {
         [self cleanupSelection];
         [self.worldView updateGridForState:self.worldState];
+        if (completionBlock) {
+            completionBlock();
+        }
     }
     
     // chose to commit the selected movement
     else if ([moveOption isEqual:options.selectedMoveOption]) {
         [self cleanupSelection];
         [self.worldView updateGridForState:self.worldState];
+        if (completionBlock) {
+            completionBlock();
+        }
     }
     
     // chose a new move option
@@ -140,6 +187,9 @@
         
         [self.worldView animateAnnotatedMovementPath:moveOption.path forObject:options.character completion:^{
             self.worldScrollView.userInteractionEnabled = YES;
+            if (completionBlock) {
+                completionBlock();
+            }
         }];
     }
 }
