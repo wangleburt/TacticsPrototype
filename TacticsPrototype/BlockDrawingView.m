@@ -12,7 +12,9 @@
 
 - (void)drawRect:(CGRect)rect
 {
-    self.drawBlock(rect);
+    if (self.drawBlock) {
+        self.drawBlock(rect);
+    }
 }
 
 @end

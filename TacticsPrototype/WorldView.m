@@ -89,23 +89,31 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
 - (void)animateAnnotatedMovementPath:(NSArray *)path forObject:(WorldObject *)object completion:(void (^)())completionBlock
 {
     if (path.count == 0) {
-        completionBlock();
+        if (completionBlock) {
+            completionBlock();
+        }
         return;
     }
     
     [self.overlayView setSelectorPosition:kNoSelectionPosition];
+    [self.overlayView cleanupMovementAnnotations];
     
     UIView *sprite = [self.sprites objectForKey:object.key];
     [self animateMovementPath:path forSprite:sprite completion:^{
         [self.overlayView setSelectorPosition:[[path lastObject] worldPointValue]];
-        completionBlock();
+        [self.overlayView annotateMovementPath:path];
+        if (completionBlock) {
+            completionBlock();
+        }
     }];
 }
 
 - (void)animateMovementPath:(NSArray *)path forObject:(WorldObject *)object completion:(void (^)())completionBlock
 {
     if (path.count == 0) {
-        completionBlock();
+        if (completionBlock) {
+            completionBlock();
+        }
         return;
     }
 
@@ -130,7 +138,9 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
         }];
 
     } else {
-        completionBlock();
+        if (completionBlock) {
+            completionBlock();
+        }
     }
 }
 
@@ -138,7 +148,9 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
 
 - (void)updateGridForState:(WorldState *)state
 {
-    GridOverlayDisplay *display = [state currentGridOverlayDisplay];    
+    [self.overlayView cleanupMovementAnnotations];
+
+    GridOverlayDisplay *display = [state currentGridOverlayDisplay];
     [self.overlayView updateViewForDisplay:display];
 }
 

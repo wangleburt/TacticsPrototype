@@ -17,6 +17,9 @@
 
 - (void)updateViewForDisplay:(GridOverlayDisplay *)display;
 
+// for annotating movement selection
 - (void)setSelectorPosition:(WorldPoint)selectorPosition;
+- (void)cleanupMovementAnnotations;
+- (void)annotateMovementPath:(NSArray *)path;
 
 @end

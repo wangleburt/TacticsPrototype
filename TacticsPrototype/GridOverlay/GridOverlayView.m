@@ -17,6 +17,7 @@
 
 @property (nonatomic) UIView *coordinatesView;
 @property (nonatomic) UIView *selectorView;
+@property (nonatomic) BlockDrawingView *pathAnnotaionView;
 
 @property (nonatomic, strong) GridOverlayDisplay *display;
 
@@ -33,6 +34,12 @@
         self.userInteractionEnabled = NO;
         self.gridDimensions = gridDimensions;
         self.unitSize = unitSize;
+        
+        BlockDrawingView *pathAnnotationView = [[BlockDrawingView alloc] initWithFrame:self.bounds];
+        pathAnnotationView.backgroundColor = [UIColor clearColor];
+        pathAnnotationView.userInteractionEnabled = NO;
+        [self addSubview:pathAnnotationView];
+        self.pathAnnotaionView = pathAnnotationView;
         
         __weak typeof(self) weakSelf = self;
         BlockDrawingView *coordsView = [[BlockDrawingView alloc] initWithFrame:self.bounds];
@@ -197,6 +204,72 @@
     }
     
     CGContextRestoreGState(context);
+}
+
+//-----------------------------------------------------------------------------------
+#pragma mark - Path Annotating
+
+- (void)cleanupMovementAnnotations
+{
+    self.pathAnnotaionView.drawBlock = nil;
+    [self.pathAnnotaionView setNeedsDisplay];
+}
+
+- (void)annotateMovementPath:(NSArray *)path
+{
+    if (path.count < 2) {
+        self.pathAnnotaionView.drawBlock = nil;
+        [self.pathAnnotaionView setNeedsDisplay];
+        return;
+    }
+    
+    CGFloat unitSize = self.unitSize;
+    CGFloat (^convert)(int) = ^CGFloat(int coordinate) {
+        return (0.5f + coordinate)*unitSize;
+    };
+    
+    self.pathAnnotaionView.drawBlock = ^(CGRect rect) {
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        CGContextSaveGState(context);
+        
+        CGMutablePathRef drawPath = CGPathCreateMutable();
+        WorldPoint startPoint = [path[0] worldPointValue];
+        CGPathMoveToPoint(drawPath, NULL, convert(startPoint.x), convert(startPoint.y));
+        for (int i=1; i<path.count; i++) {
+            WorldPoint nextPoint = [path[i] worldPointValue];
+            CGPathAddLineToPoint(drawPath, NULL, convert(nextPoint.x), convert(nextPoint.y));
+        }
+
+        CGContextSetLineJoin(context, kCGLineJoinRound);
+        
+        UIColor *lineColor = [UIColor colorWithRed:0.3 green:0.5 blue:1.0f alpha:1.0f];
+        CGContextSetStrokeColorWithColor(context, lineColor.CGColor);
+        CGContextSetLineWidth(context, 10);
+        CGContextBeginPath(context);
+        CGContextAddPath(context, drawPath);
+        CGContextStrokePath(context);
+        
+        for (int i=8; i>0; i--) {
+            CGFloat j = ((CGFloat)i)/8.0f;
+            CGFloat r = MAX(0, 0.7*j - 0.2);
+            CGFloat g = 0.4 + 0.4*j;
+            CGFloat b = 0.75 + 0.25*j;
+            UIColor *color = [UIColor colorWithRed:r green:g blue:b alpha:1.0f];
+            CGContextSetStrokeColorWithColor(context, color.CGColor);
+            CGContextSetLineWidth(context, i);
+            CGContextBeginPath(context);
+            CGContextAddPath(context, drawPath);
+            CGContextStrokePath(context);
+        }
+        
+        CGFloat imageSize = 40;
+        CGRect imageRect = (CGRect){convert(startPoint.x)-imageSize/2, convert(startPoint.y)-imageSize/2, imageSize, imageSize};
+        UIImage *cancel = [UIImage imageNamed:@"cancel"];
+        CGContextDrawImage(context, imageRect, cancel.CGImage);
+        
+        CGContextRestoreGState(context);
+    };
+    [self.pathAnnotaionView setNeedsDisplay];
 }
 
 @end

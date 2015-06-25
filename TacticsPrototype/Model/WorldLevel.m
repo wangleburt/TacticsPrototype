@@ -72,7 +72,7 @@
     
     dude = [[Character alloc] init];
     dude.characterClass = [ContentManager contentWithKey:@"class_footman"];
-    dude.position = (WorldPoint){4, 3};
+    dude.position = (WorldPoint){3, 3};
     dude.team = CharacterTeam_Player;
     dude.key = @"foot2";
     [characters addObject:dude];
