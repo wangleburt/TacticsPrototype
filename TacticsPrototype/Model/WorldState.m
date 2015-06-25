@@ -22,6 +22,7 @@
 @property (nonatomic, strong) WorldLevel *level;
 
 @property (nonatomic, strong) NSMutableArray *playerCharacters;
+@property (nonatomic, strong) NSMutableArray *enemyCharacters;
 
 @end
 
@@ -34,6 +35,7 @@
         self.level = level;
         
         self.playerCharacters = [NSMutableArray array];
+        self.enemyCharacters = [NSMutableArray array];
         [self instantiateCharacterPrototypes];
     }
     return self;
@@ -46,6 +48,7 @@
 {
     NSMutableArray *worldObjects = [NSMutableArray array];
     [worldObjects addObjectsFromArray:self.playerCharacters];
+    [worldObjects addObjectsFromArray:self.enemyCharacters];
     return worldObjects;
 }
 
@@ -54,6 +57,8 @@
     for (Character *dude in self.level.characters) {
         if (dude.team == CharacterTeam_Player) {
             [self.playerCharacters addObject:dude];
+        } else if (dude.team == CharacterTeam_Enemy) {
+            [self.enemyCharacters addObject:dude];
         }
     }
 }
@@ -74,6 +79,9 @@
     for (Character *dude in self.playerCharacters) {
         dude.movesRemaining = dude.characterClass.movement;
     }
+    for (Character *dude in self.enemyCharacters) {
+        dude.movesRemaining = dude.characterClass.movement;
+    }
 }
 
 //-------------------------------------------------------------------------------------
@@ -85,6 +93,9 @@
     if (self.characterWorldOptions) {
         for (CharacterMovementOption *option in self.characterWorldOptions.moveOptions) {
             display[option.position.x][option.position.y] = [GridOverlayTileDisplay blueTile];
+        }
+        for (CharacterAttackOption *option in self.characterWorldOptions.attackOptions) {
+            display[option.position.x][option.position.y] = [GridOverlayTileDisplay redTile];
         }
     }
     

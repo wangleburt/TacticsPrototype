@@ -13,4 +13,7 @@
 @property (nonatomic, readonly) NSUInteger movement;
 @property (nonatomic, strong, readonly) NSString *imageFileName;
 
+@property (nonatomic, readonly) int attackRangeMin;
+@property (nonatomic, readonly) int attackRangeMax;
+
 @end

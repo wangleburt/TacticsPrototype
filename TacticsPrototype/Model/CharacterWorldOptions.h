@@ -16,6 +16,13 @@
 
 @end
 
+@interface CharacterAttackOption : NSObject
+
+@property (nonatomic) WorldPoint position;
+@property (nonatomic, strong) CharacterMovementOption *moveOption;
+
+@end
+
 @class Character;
 @class WorldState;
 
@@ -23,6 +30,7 @@
 
 @property (nonatomic, strong, readonly) Character *character;
 @property (nonatomic, strong, readonly) NSArray *moveOptions;
+@property (nonatomic, strong, readonly) NSArray *attackOptions;
 
 @property (nonatomic, strong) CharacterMovementOption *selectedMoveOption;
 
@@ -30,6 +38,7 @@
 
 - (BOOL)containsPoint:(WorldPoint)point;
 - (CharacterMovementOption *)moveOptionAtPoint:(WorldPoint)point;
+- (CharacterAttackOption *)attackOptionAtPoint:(WorldPoint)point;
 
 @end
 

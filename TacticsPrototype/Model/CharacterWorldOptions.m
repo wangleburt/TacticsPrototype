@@ -8,6 +8,7 @@
 
 #import "CharacterWorldOptions.h"
 #import "Character.h"
+#import "CharacterClass.h"
 
 #import "WorldState.h"
 #import "WorldLevel.h"
@@ -18,6 +19,7 @@
 @property (nonatomic, strong) Character *character;
 
 @property (nonatomic, strong) NSArray *moveOptions;
+@property (nonatomic, strong) NSArray *attackOptions;
 
 @end
 
@@ -26,6 +28,12 @@ typedef enum {
     MoveValidity_PassThrough,
     MoveValidity_Blocked
 } MoveValidity;
+
+@interface CharacterMovementOption ()
+
+@property (nonatomic) MoveValidity moveValidity;
+
+@end
 
 @implementation CharacterWorldOptions
 
@@ -51,27 +59,33 @@ typedef enum {
     }
     
     NSMutableArray *queue = [NSMutableArray array];
-    NSMutableArray *options = [NSMutableArray array];
+    NSMutableArray *moveOptions = [NSMutableArray array];
+    NSMutableSet *attackOptions = [NSMutableSet set];
     
     CharacterMovementOption *root = [[CharacterMovementOption alloc] init];
     root.position = self.character.position;
     root.path = [NSArray arrayWithObject:[NSValue valueWithWorldPoint:root.position]];
+    root.moveValidity = MoveValidity_Valid;
     checkedTiles[root.position.x][root.position.y] = YES;
-    if (self.character.movesRemaining > 0) {
-        [queue addObject:root];
-    }
-    [options addObject:root];
+    [queue addObject:root];
+    [moveOptions addObject:root];
  
     while (queue.count > 0) {
         CharacterMovementOption *current = queue[0];
         [queue removeObjectAtIndex:0];
         
-        // check up
-        WorldPoint upp = (WorldPoint){current.position.x, current.position.y-1};
+        if (current.moveValidity == MoveValidity_Valid) {
+            [self addAttackOptionsFromMove:current toSet:attackOptions forWorldState:worldState];
+        }
+        if (current.path.count >= self.character.movesRemaining + 1) {
+            continue;
+        }
+        
+        WorldPoint up = (WorldPoint){current.position.x, current.position.y-1};
         WorldPoint down = (WorldPoint){current.position.x, current.position.y+1};
         WorldPoint left = (WorldPoint){current.position.x-1, current.position.y};
         WorldPoint right = (WorldPoint){current.position.x+1, current.position.y};
-        WorldPoint newPoints[4] = {upp, down, left, right};
+        WorldPoint newPoints[4] = {up, down, left, right};
         
         for (int i=0; i<4; i++) {
             WorldPoint point = newPoints[i];
@@ -85,17 +99,70 @@ typedef enum {
                 NSMutableArray *path = [NSMutableArray arrayWithArray:current.path];
                 [path addObject:[NSValue valueWithWorldPoint:point]];
                 newOption.path = path;
+                newOption.moveValidity = validity;
                 checkedTiles[point.x][point.y] = YES;
-                if (path.count < self.character.movesRemaining+1) {
-                    [queue addObject:newOption];
-                }
+                [queue addObject:newOption];
                 if (validity == MoveValidity_Valid) {
-                    [options addObject:newOption];
+                    [moveOptions addObject:newOption];
                 }
             }
         }
     }
-    self.moveOptions = options;
+    
+    self.moveOptions = moveOptions;
+    self.attackOptions = [self pruneAttacks:attackOptions];
+    self.selectedMoveOption = root;
+}
+
+- (void)addAttackOptionsFromMove:(CharacterMovementOption *)moveOption toSet:(NSMutableSet *)attackOptions forWorldState:(WorldState *)worldState
+{
+    WorldPoint center = moveOption.position;
+    int minRange = self.character.characterClass.attackRangeMin;
+    int maxRange = self.character.characterClass.attackRangeMax;
+    
+    WorldPoint (^clamp)(WorldPoint) = ^WorldPoint(WorldPoint point) {
+        WorldPoint result;
+        result.x = MAX(0, MIN(worldState.gridDimensions.width, point.x));
+        result.y = MAX(0, MIN(worldState.gridDimensions.height, point.y));
+        return result;
+    };
+    WorldPoint min = clamp((WorldPoint){center.x-maxRange, center.y-maxRange});
+    WorldPoint max = clamp((WorldPoint){center.x+maxRange, center.y+maxRange});
+    
+    for (int x=min.x; x<=max.x; x++) {
+        for (int y=min.y; y<=max.y; y++) {
+            int distance = abs(center.x-x) + abs(center.y-y);
+            if (distance > maxRange || distance < minRange) {
+                continue;
+            }
+            
+            WorldPoint target = (WorldPoint){x,y};
+            WorldObject *object = [worldState objectAtPosition:target];
+            if ([object isKindOfClass:Character.class]) {
+                Character *otherCharacter = (Character *)object;
+                if (otherCharacter.team == self.character.team) {
+                    continue;
+                }
+            }
+            
+            CharacterAttackOption *attack = [[CharacterAttackOption alloc] init];
+            attack.position = target;
+            attack.moveOption = moveOption;
+            [attackOptions addObject:attack];
+        }
+    }
+}
+
+- (NSArray *)pruneAttacks:(NSSet *)attackOptions
+{
+    NSMutableArray *result = [NSMutableArray array];
+    for (CharacterAttackOption *attack in attackOptions) {
+        CharacterMovementOption *move = [self moveOptionAtPoint:attack.position];
+        if (!move) {
+            [result addObject:attack];
+        }
+    }
+    return result;
 }
 
 - (MoveValidity)moveValidityForPoint:(WorldPoint)point worldState:(WorldState *)worldState
@@ -132,12 +199,27 @@ typedef enum {
             return YES;
         }
     }
+    for (CharacterAttackOption *option in self.attackOptions) {
+        if (WorldPointEqualToPoint(point, option.position)) {
+            return YES;
+        }
+    }
     return NO;
 }
 
 - (CharacterMovementOption *)moveOptionAtPoint:(WorldPoint)point
 {
     for (CharacterMovementOption *option in self.moveOptions) {
+        if (WorldPointEqualToPoint(point, option.position)) {
+            return option;
+        }
+    }
+    return nil;
+}
+
+- (CharacterAttackOption *)attackOptionAtPoint:(WorldPoint)point
+{
+    for (CharacterAttackOption *option in self.attackOptions) {
         if (WorldPointEqualToPoint(point, option.position)) {
             return option;
         }
@@ -159,6 +241,27 @@ typedef enum {
     }
     
     CharacterMovementOption *otherOption = (CharacterMovementOption *)object;
+    if (WorldPointEqualToPoint(self.position, otherOption.position)) {
+        return YES;
+    }
+    
+    return NO;
+}
+
+@end
+
+@implementation CharacterAttackOption
+
+- (BOOL)isEqual:(id)object
+{
+    if (object == self) {
+        return YES;
+    }
+    if (![object isKindOfClass:self.class]) {
+        return NO;
+    }
+    
+    CharacterAttackOption *otherOption = (CharacterAttackOption *)object;
     if (WorldPointEqualToPoint(self.position, otherOption.position)) {
         return YES;
     }

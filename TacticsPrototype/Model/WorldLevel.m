@@ -77,6 +77,20 @@
     dude.key = @"foot2";
     [characters addObject:dude];
     
+    dude = [[Character alloc] init];
+    dude.characterClass = [ContentManager contentWithKey:@"class_archer"];
+    dude.position = (WorldPoint){2, 1};
+    dude.team = CharacterTeam_Player;
+    dude.key = @"archer1";
+    [characters addObject:dude];
+    
+    dude = [[Character alloc] init];
+    dude.characterClass = [ContentManager contentWithKey:@"class_grunt"];
+    dude.position = (WorldPoint){4, 2};
+    dude.team = CharacterTeam_Enemy;
+    dude.key = @"grunt1";
+    [characters addObject:dude];
+    
     level.characters = characters;
     
     return level;
