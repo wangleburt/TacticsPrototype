@@ -10,11 +10,16 @@
 
 @interface CharacterClass ()
 
+@property (nonatomic, strong) NSString *name;
+@property (nonatomic, strong) NSString *idleImageFileName;
+@property (nonatomic, strong) NSString *headImageFileName;
+
 @property (nonatomic) NSUInteger movement;
-@property (nonatomic, strong) NSString *imageFileName;
 
 @property (nonatomic) int attackRangeMin;
 @property (nonatomic) int attackRangeMax;
+
+@property (nonatomic) int maxHealth;
 
 @end
 
@@ -24,23 +29,32 @@
 {
     CharacterClass *footman = [[CharacterClass alloc] init];
     footman.movement = 4;
-    footman.imageFileName = @"footman";
+    footman.name = @"Footman";
+    footman.idleImageFileName = @"footman-idle";
+    footman.headImageFileName = @"footman-head";
     footman.attackRangeMin = 1;
     footman.attackRangeMax = 1;
+    footman.maxHealth = 10;
     [contentManager setContent:footman forKey:@"class_footman"];
     
     CharacterClass *grunt = [[CharacterClass alloc] init];
     grunt.movement = 3;
-    grunt.imageFileName = @"grunt";
+    grunt.name = @"Grunt";
+    grunt.idleImageFileName = @"grunt-idle";
+    grunt.headImageFileName = @"grunt-head";
     grunt.attackRangeMin = 1;
     grunt.attackRangeMax = 1;
+    grunt.maxHealth = 15;
     [contentManager setContent:grunt forKey:@"class_grunt"];
     
     CharacterClass *archer = [[CharacterClass alloc] init];
     archer.movement = 4;
-    archer.imageFileName = @"archer";
+    archer.name = @"Archer";
+    archer.idleImageFileName = @"archer-idle";
+    archer.headImageFileName = @"archer-head";
     archer.attackRangeMin = 2;
     archer.attackRangeMax = 2;
+    archer.maxHealth = 6;
     [contentManager setContent:archer forKey:@"class_archer"];
 }
 

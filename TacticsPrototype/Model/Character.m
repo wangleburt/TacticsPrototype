@@ -13,7 +13,7 @@
 
 - (NSString *)imageFileName
 {
-    return self.characterClass.imageFileName;
+    return self.characterClass.idleImageFileName;
 }
 
 @end

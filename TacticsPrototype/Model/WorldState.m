@@ -60,6 +60,7 @@
         } else if (dude.team == CharacterTeam_Enemy) {
             [self.enemyCharacters addObject:dude];
         }
+        dude.health = dude.characterClass.maxHealth;
     }
 }
 

@@ -14,6 +14,7 @@ typedef enum {
 } CharacterTeam;
 
 @class CharacterClass;
+@class Weapon;
 
 @interface Character : WorldObject
 
@@ -21,5 +22,8 @@ typedef enum {
 
 @property (nonatomic, strong) CharacterClass *characterClass;
 @property (nonatomic) CharacterTeam team;
+
+@property (nonatomic) int health;
+@property (nonatomic, strong) Weapon *weapon;
 
 @end

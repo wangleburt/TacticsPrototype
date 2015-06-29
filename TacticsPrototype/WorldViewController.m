@@ -7,9 +7,10 @@
 //
 
 #import "WorldViewController.h"
-#import "WorldView.h"
 #import "PanelView.h"
+#import "CharacterInfoPanel.h";
 
+#import "WorldView.h"
 #import "WorldState.h"
 #import "WorldLevel.h"
 #import "WorldObject.h"
@@ -25,6 +26,8 @@
 
 @property (nonatomic, strong) UIScrollView *worldScrollView;
 @property (nonatomic, strong) WorldView *worldView;
+
+@property (nonatomic, strong) CharacterInfoPanel *characterInfoView;
 
 @property (nonatomic, strong) PanelView *menuPanel;
 @property (nonatomic, strong) UIButton *gridLinesButton;
@@ -45,6 +48,15 @@
     [self setupState];
     [self setupWorldView];
     [self setupMenuPanel];
+    
+    CharacterInfoPanel *panel = [[CharacterInfoPanel alloc] init];
+    [panel updateForCharacter:nil];
+    CGRect frame = panel.frame;
+    frame.origin.x = CGRectGetWidth(self.view.bounds) - CGRectGetWidth(frame) - 5;
+    frame.origin.y = 5;
+    panel.frame = frame;
+    [self.view addSubview:panel];
+    self.characterInfoView = panel;
 }
 
 - (void)setupState
@@ -67,6 +79,16 @@
 {
     [self.worldState startPlayerTurn];
     self.tapRecognizer.enabled = YES;
+}
+
+- (NSUInteger) supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskLandscape;
+}
+
+- (BOOL)prefersStatusBarHidden
+{
+    return YES;
 }
 
 //----------------------------------------------------------------------------------
@@ -222,6 +244,7 @@
         self.worldState.selectedObject = selectedObject;
         if ([selectedObject isKindOfClass:Character.class]) {
             Character *dude = (Character *)selectedObject;
+            [self.characterInfoView updateForCharacter:dude];
             CharacterWorldOptions *options = [[CharacterWorldOptions alloc] initWithCharacter:dude worldState:self.worldState];
             self.worldState.characterWorldOptions = options;
         } else {
@@ -244,6 +267,7 @@
     }
     self.worldState.selectedObject = nil;
     self.worldState.characterWorldOptions = nil;
+    [self.characterInfoView updateForCharacter:nil];
 }
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView

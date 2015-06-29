@@ -10,6 +10,7 @@
 #import "WorldContent.h"
 
 #import "CharacterClass.h"
+#import "WeaponElement.h"
 
 @interface ContentManager () <MutableContentManager>
 
@@ -42,6 +43,7 @@
     if (self) {
         self.contentDict = [NSMutableDictionary dictionary];
         [CharacterClass initializeContentIntoManager:self];
+        [WeaponElement initializeContentIntoManager:self];
     }
     return self;
 }

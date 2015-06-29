@@ -11,6 +11,7 @@
 
 #import "ContentManager.h"
 #import "Character.h"
+#import "Weapon.h"
 
 @interface WorldLevel ()
 
@@ -68,6 +69,8 @@
     dude.position = (WorldPoint){2, 2};
     dude.team = CharacterTeam_Player;
     dude.key = @"foot1";
+    dude.weapon = [[Weapon alloc] init];
+    dude.weapon.damage = 4;
     [characters addObject:dude];
     
     dude = [[Character alloc] init];
@@ -75,6 +78,8 @@
     dude.position = (WorldPoint){3, 3};
     dude.team = CharacterTeam_Player;
     dude.key = @"foot2";
+    dude.weapon = [[Weapon alloc] init];
+    dude.weapon.damage = 4;
     [characters addObject:dude];
     
     dude = [[Character alloc] init];
@@ -82,6 +87,8 @@
     dude.position = (WorldPoint){2, 1};
     dude.team = CharacterTeam_Player;
     dude.key = @"archer1";
+    dude.weapon = [[Weapon alloc] init];
+    dude.weapon.damage = 4;
     [characters addObject:dude];
     
     dude = [[Character alloc] init];
@@ -89,6 +96,8 @@
     dude.position = (WorldPoint){4, 2};
     dude.team = CharacterTeam_Enemy;
     dude.key = @"grunt1";
+    dude.weapon = [[Weapon alloc] init];
+    dude.weapon.damage = 5;
     [characters addObject:dude];
     
     level.characters = characters;
