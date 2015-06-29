@@ -62,7 +62,7 @@ typedef enum {
     
     NSMutableArray *queue = [NSMutableArray array];
     NSMutableArray *moveOptions = [NSMutableArray array];
-    NSMutableSet *attackOptions = [NSMutableSet set];
+    NSMutableArray *attackOptions = [NSMutableArray array];
     NSMutableSet *allMovePoints = [NSMutableSet set];
     
     CharacterMovementOption *root = [[CharacterMovementOption alloc] init];
@@ -79,7 +79,7 @@ typedef enum {
         [allMovePoints addObject:[NSValue valueWithWorldPoint:current.position]];
         
         if (current.moveValidity == MoveValidity_Valid) {
-            [self addAttackOptionsFromMove:current toSet:attackOptions forWorldState:worldState];
+            [self addAttackOptionsFromMove:current toArray:attackOptions forWorldState:worldState];
         }
         if (current.path.count >= self.character.movesRemaining + 1) {
             continue;
@@ -119,7 +119,7 @@ typedef enum {
     self.pointsInMovementRange = allMovePoints;
 }
 
-- (void)addAttackOptionsFromMove:(CharacterMovementOption *)moveOption toSet:(NSMutableSet *)attackOptions forWorldState:(WorldState *)worldState
+- (void)addAttackOptionsFromMove:(CharacterMovementOption *)moveOption toArray:(NSMutableArray *)attackOptions forWorldState:(WorldState *)worldState
 {
     WorldPoint center = moveOption.position;
     int minRange = self.character.characterClass.attackRangeMin;
@@ -158,7 +158,25 @@ typedef enum {
     }
 }
 
-- (NSArray *)pruneAttacks:(NSSet *)attackOptions
+- (void)addAttack:(CharacterAttackOption *)attack toOptions:(NSMutableArray *)options
+{
+    CharacterAttackOption *existingOption = nil;
+    for (CharacterAttackOption *otherOption in options) {
+        if (WorldPointEqualToPoint(attack.position, otherOption.position)) {
+            existingOption = otherOption;
+            break;
+        }
+    }
+    
+    if (!existingOption) {
+        [options addObject:attack];
+    } else if (attack.moveOption.path.count < existingOption.moveOption.path.count) {
+        [options removeObject:existingOption];
+        [options addObject:attack];
+    }
+}
+
+- (NSArray *)pruneAttacks:(NSArray *)attackOptions
 {
     NSMutableArray *result = [NSMutableArray array];
     for (CharacterAttackOption *attack in attackOptions) {
