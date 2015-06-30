@@ -12,6 +12,9 @@
 
 @interface CombatPreviewView : UIView
 
+@property (nonatomic, copy) void (^cancelBlock)();
+@property (nonatomic, copy) void (^confirmBlock)(CombatModel *);
+
 - (void)updateWithCombatModel:(CombatModel *)model;
 
 @end

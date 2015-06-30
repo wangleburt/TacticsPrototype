@@ -46,6 +46,7 @@
 {
     [super viewDidLoad];
     
+    __weak typeof(self) weakSelf = self;
     self.view.backgroundColor = [UIColor blackColor];
     
     [self setupState];
@@ -63,6 +64,13 @@
     
     CombatPreviewView *combatPreview = [[CombatPreviewView alloc] initWithFrame:self.view.bounds];
     combatPreview.hidden = YES;
+    combatPreview.cancelBlock = ^void() {
+        weakSelf.combatPreview.hidden = YES;
+    };
+    combatPreview.confirmBlock = ^void(CombatModel *model) {
+        weakSelf.combatPreview.hidden = YES;
+        [weakSelf performAttackWithCombatModel:model];
+    };
     [self.view addSubview:combatPreview];
     self.combatPreview = combatPreview;
 }
@@ -189,6 +197,13 @@
     CombatModel *combatModel = [[CombatModel alloc] initWithPlayer:options.character andEnemy:target range:range];
     [self.combatPreview updateWithCombatModel:combatModel];
     self.combatPreview.hidden = NO;
+}
+
+- (void)performAttackWithCombatModel:(CombatModel *)combatModel
+{
+    [self cleanupSelection];
+    
+    
 }
 
 - (void)handleMoveSelection:(CharacterMovementOption *)moveOption withCompletion:(void (^)())completionBlock

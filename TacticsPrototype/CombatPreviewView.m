@@ -31,6 +31,8 @@
 @property (nonatomic, strong) PreviewElementsPanel *playerPanel;
 @property (nonatomic, strong) PreviewElementsPanel *enemyPanel;
 
+@property (nonatomic, strong) CombatModel *combatModel;
+
 @end
 
 @implementation CombatPreviewView
@@ -42,6 +44,11 @@
         self.backgroundColor = [UIColor colorWithWhite:0 alpha:0.4f];
         
         CGFloat centerWidth = 50;
+        
+        UIButton *bgButton = [[UIButton alloc] initWithFrame:self.bounds];
+        bgButton.backgroundColor = [UIColor clearColor];
+        [bgButton addTarget:self action:@selector(touchedCancel) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:bgButton];
         
         CGRect centerFrame = (CGRect){CGRectGetMidX(self.bounds) - centerWidth/2, 0, centerWidth, 0};
         BlockDrawingView *centerView = [[BlockDrawingView alloc] initWithFrame:centerFrame];
@@ -79,7 +86,7 @@
         PreviewElementsPanel *playerPanel = [[PreviewElementsPanel alloc] initWithTeam:CharacterTeam_Player];
         CGRect panelFrame = playerPanel.frame;
         panelFrame.origin.x = CGRectGetMidX(self.bounds) - centerWidth/2 - CGRectGetWidth(panelFrame);
-        panelFrame.origin.y = CGRectGetMidY(self.bounds) - CGRectGetHeight(panelFrame)/2;
+        panelFrame.origin.y = CGRectGetMidY(self.bounds) - CGRectGetHeight(panelFrame)/2 - 40;
         playerPanel.frame = panelFrame;
         [self addSubview:playerPanel];
         self.playerPanel = playerPanel;
@@ -93,12 +100,12 @@
         self.enemyPanel = enemyPanel;
         
         centerFrame.origin.y = CGRectGetMinY(panelFrame) + 30;
-        centerFrame.size.height = CGRectGetHeight(panelFrame) - 45;
+        centerFrame.size.height = CGRectGetHeight(panelFrame) - 40;
         centerView.frame = centerFrame;
         
         CGRect labelFrame = centerView.bounds;
         labelFrame.size.height = 15;
-        labelFrame.origin.y = CGRectGetMaxY(centerView.bounds) - 25;
+        labelFrame.origin.y = CGRectGetMaxY(centerView.bounds) - 23;
         UILabel *label = [[UILabel alloc] initWithFrame:labelFrame];
         label.backgroundColor = [UIColor clearColor];
         label.textColor = [UIColor blackColor];
@@ -153,12 +160,53 @@
         [centerView addSubview:iconView];
         self.enemyAdvantageIcon = iconView;
         
+        UIButton *(^actionButton)(CGRect, NSString*) = ^UIButton*(CGRect referenceFrame, NSString *iconName)
+        {
+            UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+            button.layer.cornerRadius = 5;
+            button.layer.borderWidth = 2;
+            button.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:15];
+            [button setTitleColor:[UIColor colorWithWhite:1 alpha:0.9] forState:UIControlStateNormal];
+            CGRect buttonFrame = referenceFrame;
+            buttonFrame.size.height = 60;
+            buttonFrame.origin.y = CGRectGetMaxY(referenceFrame) + 20;
+            buttonFrame = CGRectInset(buttonFrame, 15, 5);
+            button.frame = buttonFrame;
+            button.titleEdgeInsets = UIEdgeInsetsMake(0, 40, 0, 0);
+            
+            CGFloat iconSize = 30;
+            CGRect iconFrame = (CGRect){CGPointZero, iconSize, iconSize};
+            iconFrame.origin.y = CGRectGetMidY(button.bounds) - iconSize/2;
+            iconFrame.origin.x = CGRectGetMidX(button.bounds) - iconSize - 20;
+            UIImageView *iconImage = [[UIImageView alloc] initWithFrame:iconFrame];
+            iconImage.backgroundColor = [UIColor clearColor];
+            iconImage.contentMode = UIViewContentModeScaleAspectFit;
+            iconImage.image = [UIImage imageNamed:iconName];
+            [button addSubview:iconImage];
+
+            [self addSubview:button];
+            return button;
+        };
+        
+        UIButton *button = actionButton(self.playerPanel.frame, @"run-icon");
+        [button setTitle:@"Cancel" forState:UIControlStateNormal];
+        [button addTarget:self action:@selector(touchedCancel) forControlEvents:UIControlEventTouchUpInside];
+        button.backgroundColor = [UIColor colorWithRed:0.1 green:0.2 blue:1.0 alpha:1];
+        button.layer.borderColor = [UIColor colorWithRed:0.58 green:0.62 blue:0.94 alpha:1].CGColor;
+        
+        button = actionButton(self.enemyPanel.frame, @"attack-icon");
+        [button setTitle:@"Attack!" forState:UIControlStateNormal];
+        [button addTarget:self action:@selector(touchedConfirm) forControlEvents:UIControlEventTouchUpInside];
+        button.backgroundColor = [UIColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1];
+        button.layer.borderColor = [UIColor colorWithRed:0.85 green:0.55 blue:0.55 alpha:1].CGColor;
     }
     return self;
 }
 
 - (void)updateWithCombatModel:(CombatModel *)model
 {
+    self.combatModel = model;
+    
     [self.enemyPanel updateWithAttack:model.enemyAttack fromCharacter:model.enemy];
     [self.playerPanel updateWithAttack:model.playerAttack fromCharacter:model.player];
     
@@ -182,6 +230,20 @@
     
     ElementComparison enemyComp = [model.enemy.weapon.element compareAgainstElement:model.player.weapon.element];
     setCompImage(self.enemyAdvantageIcon, enemyComp);
+}
+
+- (void)touchedCancel
+{
+    if (self.cancelBlock) {
+        self.cancelBlock();
+    }
+}
+
+- (void)touchedConfirm
+{
+    if (self.confirmBlock) {
+        self.confirmBlock(self.combatModel);
+    }
 }
 
 @end
@@ -209,7 +271,7 @@
 
 - (instancetype)initWithTeam:(CharacterTeam)team
 {
-    CGRect frame = (CGRect){CGPointZero, 200, 180};
+    CGRect frame = (CGRect){CGPointZero, 200, 173};
     self = [super initWithFrame:frame];
     if (self) {
         self.backgroundColor = [UIColor clearColor];
