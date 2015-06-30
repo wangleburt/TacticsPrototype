@@ -31,6 +31,8 @@
 		31493E871B3CB66D002D4380 /* Weapon.m in Sources */ = {isa = PBXBuildFile; fileRef = 31493E861B3CB66D002D4380 /* Weapon.m */; };
 		31493E8A1B3CB969002D4380 /* WeaponElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 31493E891B3CB969002D4380 /* WeaponElement.m */; };
 		31493E8D1B3DE682002D4380 /* CharacterInfoPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 31493E8C1B3DE682002D4380 /* CharacterInfoPanel.m */; };
+		31493E901B41F64D002D4380 /* CombatModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 31493E8F1B41F64D002D4380 /* CombatModel.m */; };
+		31493E931B420AC7002D4380 /* CombatPreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = 31493E921B420AC7002D4380 /* CombatPreviewView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,6 +94,10 @@
 		31493E891B3CB969002D4380 /* WeaponElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WeaponElement.m; sourceTree = "<group>"; };
 		31493E8B1B3DE682002D4380 /* CharacterInfoPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CharacterInfoPanel.h; sourceTree = "<group>"; };
 		31493E8C1B3DE682002D4380 /* CharacterInfoPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CharacterInfoPanel.m; sourceTree = "<group>"; };
+		31493E8E1B41F64D002D4380 /* CombatModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CombatModel.h; sourceTree = "<group>"; };
+		31493E8F1B41F64D002D4380 /* CombatModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CombatModel.m; sourceTree = "<group>"; };
+		31493E911B420AC7002D4380 /* CombatPreviewView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CombatPreviewView.h; sourceTree = "<group>"; };
+		31493E921B420AC7002D4380 /* CombatPreviewView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CombatPreviewView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +151,8 @@
 				31493E651B39CDB5002D4380 /* BlockDrawingView.m */,
 				31493E8B1B3DE682002D4380 /* CharacterInfoPanel.h */,
 				31493E8C1B3DE682002D4380 /* CharacterInfoPanel.m */,
+				31493E911B420AC7002D4380 /* CombatPreviewView.h */,
+				31493E921B420AC7002D4380 /* CombatPreviewView.m */,
 				31493E5C1B38D9E8002D4380 /* GridOverlay */,
 				3111B1EE1B38862D00F51534 /* Model */,
 				3111B1CC1B387D3400F51534 /* Images.xcassets */,
@@ -193,6 +201,8 @@
 				31493E681B39DA0B002D4380 /* TerrainMap.m */,
 				31493E7F1B3B387E002D4380 /* CharacterWorldOptions.h */,
 				31493E801B3B387E002D4380 /* CharacterWorldOptions.m */,
+				31493E8E1B41F64D002D4380 /* CombatModel.h */,
+				31493E8F1B41F64D002D4380 /* CombatModel.m */,
 				31493E7E1B3A0DE2002D4380 /* Content */,
 				31493E781B3A03DA002D4380 /* WorldObject.h */,
 				31493E791B3A03DA002D4380 /* WorldObject.m */,
@@ -335,6 +345,8 @@
 				31493E711B3A0045002D4380 /* ContentManager.m in Sources */,
 				31493E6E1B39FEDC002D4380 /* CharacterClass.m in Sources */,
 				3111B1C51B387D3400F51534 /* AppDelegate.m in Sources */,
+				31493E901B41F64D002D4380 /* CombatModel.m in Sources */,
+				31493E931B420AC7002D4380 /* CombatPreviewView.m in Sources */,
 				31493E8D1B3DE682002D4380 /* CharacterInfoPanel.m in Sources */,
 				31493E691B39DA0B002D4380 /* TerrainMap.m in Sources */,
 				31493E551B38C577002D4380 /* PanelView.m in Sources */,

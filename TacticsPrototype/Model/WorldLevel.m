@@ -71,6 +71,7 @@
     dude.key = @"foot1";
     dude.weapon = [[Weapon alloc] init];
     dude.weapon.damage = 4;
+    dude.weapon.element = [ContentManager contentWithKey:@"element_earth"];
     [characters addObject:dude];
     
     dude = [[Character alloc] init];
@@ -80,6 +81,7 @@
     dude.key = @"foot2";
     dude.weapon = [[Weapon alloc] init];
     dude.weapon.damage = 4;
+    dude.weapon.element = [ContentManager contentWithKey:@"element_water"];
     [characters addObject:dude];
     
     dude = [[Character alloc] init];
@@ -89,6 +91,7 @@
     dude.key = @"archer1";
     dude.weapon = [[Weapon alloc] init];
     dude.weapon.damage = 4;
+    dude.weapon.element = [ContentManager contentWithKey:@"element_fire"];
     [characters addObject:dude];
     
     dude = [[Character alloc] init];
@@ -98,6 +101,7 @@
     dude.key = @"grunt1";
     dude.weapon = [[Weapon alloc] init];
     dude.weapon.damage = 5;
+    dude.weapon.element = [ContentManager contentWithKey:@"element_none"];
     [characters addObject:dude];
     
     level.characters = characters;

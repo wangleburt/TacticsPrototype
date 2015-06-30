@@ -136,12 +136,12 @@ typedef enum {
     
     for (int x=min.x; x<=max.x; x++) {
         for (int y=min.y; y<=max.y; y++) {
-            int distance = abs(center.x-x) + abs(center.y-y);
+            WorldPoint target = (WorldPoint){x,y};
+            int distance = WorldPointRangeToPoint(center, target);
             if (distance > maxRange || distance < minRange) {
                 continue;
             }
             
-            WorldPoint target = (WorldPoint){x,y};
             WorldObject *object = [worldState objectAtPosition:target];
             if ([object isKindOfClass:Character.class]) {
                 Character *otherCharacter = (Character *)object;
@@ -260,7 +260,7 @@ typedef enum {
     
     int (^heuristic)(NSArray *) = ^int(NSArray *path) {
         WorldPoint lastPoint = [[path lastObject] worldPointValue];
-        int range = abs(lastPoint.x - endPoint.x) + abs(lastPoint.y - endPoint.y);
+        int range = WorldPointRangeToPoint(lastPoint, endPoint);
         return range + (int)path.count;
     };
     NSComparisonResult (^prioritySorter)(id, id) = ^NSComparisonResult(id obj1, id obj2) {

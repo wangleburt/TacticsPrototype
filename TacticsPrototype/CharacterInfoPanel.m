@@ -45,13 +45,13 @@ static CGFloat const kShadowOffset = 3;
         UILabel *healthLabel = [[UILabel alloc] initWithFrame:healthFrame];
         healthLabel.backgroundColor = [UIColor clearColor];
         healthLabel.textColor = [UIColor colorWithWhite:1 alpha:0.9];
-        healthLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:15];
+        healthLabel.font = [UIFont fontWithName:@"Helvetica" size:13];
         healthLabel.minimumScaleFactor = 0.8;
         healthLabel.adjustsFontSizeToFitWidth = YES;
         [self addSubview:healthLabel];
         self.healthLabel = healthLabel;
         
-        CGRect nameFrame = CGRectOffset(healthFrame, 0, -healthFrame.size.height-5);
+        CGRect nameFrame = CGRectOffset(healthFrame, 0, -healthFrame.size.height-2);
         UILabel *nameLabel = [[UILabel alloc] initWithFrame:nameFrame];
         nameLabel.backgroundColor = [UIColor clearColor];
         nameLabel.textColor = [UIColor colorWithWhite:1 alpha:0.9];

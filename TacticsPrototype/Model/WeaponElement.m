@@ -11,6 +11,7 @@
 
 @interface WeaponElement ()
 
+@property (nonatomic, strong) NSString *name;
 @property (nonatomic, strong) NSString *iconFileName;
 
 @property (nonatomic, strong) NSArray *strongAgainstKeys;
@@ -26,27 +27,37 @@
 + (void)initializeContentIntoManager:(id<MutableContentManager>)contentManager
 {
     WeaponElement *fire = [[WeaponElement alloc] init];
-    fire.strongAgainstKeys = @[@"element_earth"];
+    fire.name = @"Fire";
+    fire.iconFileName = @"elem-fire";
+    fire.strongAgainstKeys = @[@"element_earth", @"element_none"];
     fire.weakAgainstKeys = @[@"element_water"];
     [contentManager setContent:fire forKey:@"element_fire"];
     
     WeaponElement *earth = [[WeaponElement alloc] init];
-    earth.strongAgainstKeys = @[@"element_water"];
+    earth.name = @"Earth";
+    earth.iconFileName = @"elem-earth";
+    earth.strongAgainstKeys = @[@"element_water", @"element_none"];
     earth.weakAgainstKeys = @[@"element_fire"];
     [contentManager setContent:earth forKey:@"element_earth"];
     
     WeaponElement *water = [[WeaponElement alloc] init];
-    water.strongAgainstKeys = @[@"element_fire"];
+    water.name = @"Water";
+    water.iconFileName = @"elem-water";
+    water.strongAgainstKeys = @[@"element_fire", @"element_none"];
     water.weakAgainstKeys = @[@"element_earth"];
     [contentManager setContent:water forKey:@"element_water"];
     
     WeaponElement *none = [[WeaponElement alloc] init];
+    none.name = @"No Element";
+    none.iconFileName = @"elem-none";
     none.strongAgainstKeys = @[];
-    none.weakAgainstKeys = @[];
+    none.weakAgainstKeys = @[@"element_fire", @"element_earth", @"element_water", @"element_light"];
     [contentManager setContent:none forKey:@"element_none"];
     
     WeaponElement *light = [[WeaponElement alloc] init];
-    light.strongAgainstKeys = @[@"element_fire", @"element_earth", @"element_water"];
+    light.name = @"Light";
+    light.iconFileName = @"elem-light";
+    light.strongAgainstKeys = @[@"element_fire", @"element_earth", @"element_water", @"element_none"];
     light.weakAgainstKeys = @[];
     [contentManager setContent:light forKey:@"element_light"];
 }
@@ -81,6 +92,17 @@
     }
     
     return _weakAgainst;
+}
+
+- (ElementComparison)compareAgainstElement:(WeaponElement *)otherElement
+{
+    if ([self.strongAgainst containsObject:otherElement]) {
+        return ElementComparison_Advantage;
+    } else if ([self.weakAgainst containsObject:otherElement]) {
+        return ElementComparison_Disadvantage;
+    } else {
+        return ElementComparison_None;
+    }
 }
 
 @end

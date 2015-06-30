@@ -12,19 +12,19 @@
 
 @interface Weapon ()
 
-//@property (nonatomic, strong) NSString *elementKey;
+@property (nonatomic, strong) NSString *elementKey;
 //@property (nonatomic, strong) WeaponElement *element;
 
 @end
 
 @implementation Weapon
 
-//- (WeaponElement *)element
-//{
-//    if (!_element) {
-//        _element = [ContentManager contentWithKey:self.elementKey];
-//    }
-//    return _element;
-//}
+- (WeaponElement *)element
+{
+    if (!_element) {
+        _element = [ContentManager contentWithKey:self.elementKey];
+    }
+    return _element;
+}
 
 @end

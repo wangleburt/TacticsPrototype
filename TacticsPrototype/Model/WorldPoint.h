@@ -22,6 +22,12 @@ BOOL __WorldPointEqualToPoint(WorldPoint point1, WorldPoint point2) {
 }
 #define WorldPointEqualToPoint __WorldPointEqualToPoint
 
+static inline
+int __WorldPointRangeToPoint(WorldPoint point1, WorldPoint point2) {
+    return abs(point1.x - point2.x) + abs(point1.y - point2.y);
+}
+#define WorldPointRangeToPoint __WorldPointRangeToPoint
+
 @interface NSValue (WorldPoint)
 
 + (NSValue *)valueWithWorldPoint:(WorldPoint)point;

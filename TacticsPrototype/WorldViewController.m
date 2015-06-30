@@ -8,7 +8,8 @@
 
 #import "WorldViewController.h"
 #import "PanelView.h"
-#import "CharacterInfoPanel.h";
+#import "CharacterInfoPanel.h"
+#import "CombatPreviewView.h"
 
 #import "WorldView.h"
 #import "WorldState.h"
@@ -18,6 +19,7 @@
 #import "Character.h"
 #import "CharacterClass.h"
 #import "CharacterWorldOptions.h"
+#import "CombatModel.h"
 
 @interface WorldViewController () <UIScrollViewDelegate>
 
@@ -28,6 +30,7 @@
 @property (nonatomic, strong) WorldView *worldView;
 
 @property (nonatomic, strong) CharacterInfoPanel *characterInfoView;
+@property (nonatomic, strong) CombatPreviewView *combatPreview;
 
 @property (nonatomic, strong) PanelView *menuPanel;
 @property (nonatomic, strong) UIButton *gridLinesButton;
@@ -57,6 +60,11 @@
     panel.frame = frame;
     [self.view addSubview:panel];
     self.characterInfoView = panel;
+    
+    CombatPreviewView *combatPreview = [[CombatPreviewView alloc] initWithFrame:self.view.bounds];
+    combatPreview.hidden = YES;
+    [self.view addSubview:combatPreview];
+    self.combatPreview = combatPreview;
 }
 
 - (void)setupState
@@ -160,8 +168,7 @@
     Character *target = (Character *)attackedObject;
     if (target.team == CharacterTeam_Enemy) {
         WorldPoint currentPosition = options.selectedMoveOption.position;
-        int range = abs(currentPosition.x - target.position.x) +
-                    abs(currentPosition.y - target.position.y);
+        int range = WorldPointRangeToPoint(currentPosition, target.position);
         CharacterClass *charClass = options.character.characterClass;
         if (range >= charClass.attackRangeMin && range <= charClass.attackRangeMax) {
             [self presentAttackOption:attackOption onTarget:target];
@@ -177,7 +184,11 @@
 
 - (void)presentAttackOption:(CharacterAttackOption *)attack onTarget:(Character *)target
 {
-    NSLog(@"ATTACK");
+    CharacterWorldOptions *options = self.worldState.characterWorldOptions;
+    int range = WorldPointRangeToPoint(attack.moveOption.position, attack.position);
+    CombatModel *combatModel = [[CombatModel alloc] initWithPlayer:options.character andEnemy:target range:range];
+    [self.combatPreview updateWithCombatModel:combatModel];
+    self.combatPreview.hidden = NO;
 }
 
 - (void)handleMoveSelection:(CharacterMovementOption *)moveOption withCompletion:(void (^)())completionBlock

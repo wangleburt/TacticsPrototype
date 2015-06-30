@@ -12,7 +12,7 @@
 
 @interface Weapon : NSObject
 
-//@property (nonatomic, strong, readonly) WeaponElement *element;
+@property (nonatomic, strong) WeaponElement *element;
 
 @property (nonatomic) int damage;
 
