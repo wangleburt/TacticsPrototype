@@ -192,7 +192,7 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
     }
     
     UILabel *defenderLabel = nil;
-    if (attackModel.roll == AttackRoll_Hit) {
+    if (attackModel.roll != AttackRoll_Miss) {
         defenderLabel = [[UILabel alloc] init];
         defenderLabel.backgroundColor = [UIColor clearColor];
         defenderLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:15];
@@ -244,6 +244,10 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
 
 - (void)animateLabel:(UILabel *)label overSprite:(UIView *)sprite
 {
+    if (!label) {
+        return;
+    }
+    
     CGPoint center = sprite.center;
     center.y -= kWorldGridUnitSize / 2;
     label.center = center;

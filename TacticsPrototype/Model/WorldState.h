@@ -14,6 +14,7 @@
 @class WorldObject;
 @class GridOverlayDisplay;
 @class CharacterWorldOptions;
+@class CombatModel;
 
 @interface WorldState : NSObject
 
@@ -34,5 +35,7 @@
 
 - (GridOverlayDisplay *)currentGridOverlayDisplay;
 - (WorldObject *)objectAtPosition:(WorldPoint)position;
+
+- (void)applyCombat:(CombatModel *)combatModel;
 
 @end

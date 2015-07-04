@@ -207,8 +207,9 @@
     [self cleanupSelection];
     [self.worldView updateGridForState:self.worldState];
     
-    CombatModel *model = [CombatModel combatModelFromPreview:preview withFirstAttacker:preview.player];
-    [self.worldView animateCombat:model completion:^(CombatModel *model) {
+    CombatModel *combatModel = [CombatModel combatModelFromPreview:preview withFirstAttacker:preview.player];
+    [self.worldState applyCombat:combatModel];
+    [self.worldView animateCombat:combatModel completion:^(CombatModel *model) {
         
     }];
 }

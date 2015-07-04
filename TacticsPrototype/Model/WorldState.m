@@ -16,6 +16,7 @@
 #import "Character.h"
 #import "CharacterClass.h"
 #import "CharacterWorldOptions.h"
+#import "CombatModel.h"
 
 @interface WorldState ()
 
@@ -82,6 +83,25 @@
     }
     for (Character *dude in self.enemyCharacters) {
         dude.movesRemaining = dude.characterClass.movement;
+    }
+}
+
+- (void)applyCombat:(CombatModel *)combatModel
+{
+    for (AttackModel *attack in combatModel.attacks) {
+        attack.defender.health = MAX(attack.defender.health - attack.damage, 0);
+        if (attack.defender.health <= 0) {
+            [self removeWorldObject:attack.defender];
+        }
+    }
+}
+
+- (void)removeWorldObject:(WorldObject *)worldObject
+{
+    if ([self.playerCharacters containsObject:worldObject]) {
+        [self.playerCharacters removeObject:worldObject];
+    } else if ([self.enemyCharacters containsObject:worldObject]) {
+        [self.enemyCharacters removeObject:worldObject];
     }
 }
 
