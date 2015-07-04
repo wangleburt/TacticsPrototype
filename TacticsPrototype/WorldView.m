@@ -256,7 +256,7 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
     if (attackModel.roll == AttackRoll_Crit) {
         [self animateLabel:attackerLabel overSprite:attackerSprite];
     }
-    [UIView animateWithDuration:0.2 animations:^{
+    [UIView animateWithDuration:0.1 animations:^{
         attackerSprite.center = attackerEnd;
     } completion:^(BOOL finished) {
         if (attackModel.roll == AttackRoll_Miss) {
@@ -264,7 +264,7 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
         } else {
             [self animateLabel:defenderLabel overSprite:defenderSprite];
         }
-        [UIView animateWithDuration:0.5 animations:^{
+        [UIView animateWithDuration:0.3 animations:^{
             attackerSprite.center = attackerStart;
             if (attackModel.isKill) {
                 defenderSprite.alpha = 0.0f;

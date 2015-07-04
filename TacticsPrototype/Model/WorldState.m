@@ -22,7 +22,7 @@
 
 @property (nonatomic, strong) WorldLevel *level;
 
-@property (nonatomic, strong) NSMutableArray *playerCharacters;
+@property (nonatomic, strong) NSMutableArray *mutablePlayerCharacters;
 @property (nonatomic, strong) NSMutableArray *enemyCharacters;
 
 @end
@@ -35,7 +35,7 @@
     if (self) {
         self.level = level;
         
-        self.playerCharacters = [NSMutableArray array];
+        self.mutablePlayerCharacters = [NSMutableArray array];
         self.enemyCharacters = [NSMutableArray array];
         [self instantiateCharacterPrototypes];
     }
@@ -48,16 +48,21 @@
 - (NSArray *)worldObjects
 {
     NSMutableArray *worldObjects = [NSMutableArray array];
-    [worldObjects addObjectsFromArray:self.playerCharacters];
+    [worldObjects addObjectsFromArray:self.mutablePlayerCharacters];
     [worldObjects addObjectsFromArray:self.enemyCharacters];
     return worldObjects;
+}
+
+- (NSArray *)playerCharacters
+{
+    return self.mutablePlayerCharacters;
 }
 
 - (void)instantiateCharacterPrototypes
 {
     for (Character *dude in self.level.characters) {
         if (dude.team == CharacterTeam_Player) {
-            [self.playerCharacters addObject:dude];
+            [self.mutablePlayerCharacters addObject:dude];
         } else if (dude.team == CharacterTeam_Enemy) {
             [self.enemyCharacters addObject:dude];
         }
@@ -78,14 +83,24 @@
 
 - (void)startPlayerTurn
 {
-    for (Character *dude in self.playerCharacters) {
+    for (Character *dude in self.mutablePlayerCharacters) {
         dude.movesRemaining = dude.characterClass.movement;
         dude.isActive = YES;
     }
     for (Character *dude in self.enemyCharacters) {
         dude.movesRemaining = dude.characterClass.movement;
-        dude.isActive = NO;
+        dude.isActive = YES;
     }
+}
+
+- (BOOL)playerHasActiveCharacters
+{
+    for (Character *dude in self.mutablePlayerCharacters) {
+        if (dude.isActive) {
+            return YES;
+        }
+    }
+    return NO;
 }
 
 - (void)applyCombat:(CombatModel *)combatModel
@@ -104,11 +119,56 @@
 
 - (void)removeWorldObject:(WorldObject *)worldObject
 {
-    if ([self.playerCharacters containsObject:worldObject]) {
-        [self.playerCharacters removeObject:worldObject];
+    if ([self.mutablePlayerCharacters containsObject:worldObject]) {
+        [self.mutablePlayerCharacters removeObject:worldObject];
     } else if ([self.enemyCharacters containsObject:worldObject]) {
         [self.enemyCharacters removeObject:worldObject];
     }
+}
+
+- (BOOL)characterHasActionOptions:(Character *)character
+{
+    if (!character.isActive) {
+        return NO;
+    }
+    
+    if (character.movesRemaining > 0) {
+        return YES;
+    }
+    
+    // check if character has any attacks from his current position
+    WorldPoint center = character.position;
+    int minRange = character.characterClass.attackRangeMin;
+    int maxRange = character.characterClass.attackRangeMax;
+    
+    WorldPoint (^clamp)(WorldPoint) = ^WorldPoint(WorldPoint point) {
+        WorldPoint result;
+        result.x = MAX(0, MIN(self.gridDimensions.width, point.x));
+        result.y = MAX(0, MIN(self.gridDimensions.height, point.y));
+        return result;
+    };
+    WorldPoint min = clamp((WorldPoint){center.x-maxRange, center.y-maxRange});
+    WorldPoint max = clamp((WorldPoint){center.x+maxRange, center.y+maxRange});
+    
+    for (int x=min.x; x<=max.x; x++) {
+        for (int y=min.y; y<=max.y; y++) {
+            WorldPoint target = (WorldPoint){x,y};
+            int distance = WorldPointRangeToPoint(center, target);
+            if (distance > maxRange || distance < minRange) {
+                continue;
+            }
+            
+            WorldObject *object = [self objectAtPosition:target];
+            if ([object isKindOfClass:Character.class]) {
+                Character *otherCharacter = (Character *)object;
+                if (otherCharacter.team != character.team) {
+                    return YES;
+                }
+            }
+        }
+    }
+
+    return NO;
 }
 
 //-------------------------------------------------------------------------------------

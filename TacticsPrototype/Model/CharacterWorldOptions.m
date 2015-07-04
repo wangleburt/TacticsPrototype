@@ -153,7 +153,7 @@ typedef enum {
             CharacterAttackOption *attack = [[CharacterAttackOption alloc] init];
             attack.position = target;
             attack.moveOption = moveOption;
-            [attackOptions addObject:attack];
+            [self addAttack:attack toOptions:attackOptions];
         }
     }
 }

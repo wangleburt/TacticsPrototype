@@ -86,12 +86,22 @@
     
     dude = [[Character alloc] init];
     dude.characterClass = [ContentManager contentWithKey:@"class_archer"];
-    dude.position = (WorldPoint){2, 1};
+    dude.position = (WorldPoint){1, 1};
     dude.team = CharacterTeam_Player;
     dude.key = @"archer1";
     dude.weapon = [[Weapon alloc] init];
     dude.weapon.damage = 4;
     dude.weapon.element = [ContentManager contentWithKey:@"element_fire"];
+    [characters addObject:dude];
+    
+    dude = [[Character alloc] init];
+    dude.characterClass = [ContentManager contentWithKey:@"class_archer"];
+    dude.position = (WorldPoint){2, 1};
+    dude.team = CharacterTeam_Player;
+    dude.key = @"archer2";
+    dude.weapon = [[Weapon alloc] init];
+    dude.weapon.damage = 4;
+    dude.weapon.element = [ContentManager contentWithKey:@"element_earth"];
     [characters addObject:dude];
     
     dude = [[Character alloc] init];

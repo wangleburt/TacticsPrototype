@@ -15,6 +15,7 @@
 @class GridOverlayDisplay;
 @class CharacterWorldOptions;
 @class CombatModel;
+@class Character;
 
 @interface WorldState : NSObject
 
@@ -25,6 +26,8 @@
 @property (nonatomic) CGSize gridDimensions;
 
 @property (nonatomic, readonly) NSArray *worldObjects;
+@property (nonatomic, readonly) NSArray *playerCharacters;
+
 @property (nonatomic, strong) WorldObject *selectedObject;
 
 @property (nonatomic, strong) CharacterWorldOptions *characterWorldOptions;
@@ -32,10 +35,13 @@
 - (instancetype)initWithLevel:(WorldLevel *)level;
 
 - (void)startPlayerTurn;
+- (BOOL)playerHasActiveCharacters;
 
 - (GridOverlayDisplay *)currentGridOverlayDisplay;
 - (WorldObject *)objectAtPosition:(WorldPoint)position;
 
 - (void)applyCombat:(CombatModel *)combatModel;
+
+- (BOOL)characterHasActionOptions:(Character *)character;
 
 @end
