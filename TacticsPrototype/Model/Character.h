@@ -22,8 +22,9 @@ typedef enum {
 
 @property (nonatomic, strong) CharacterClass *characterClass;
 @property (nonatomic) CharacterTeam team;
+@property (nonatomic, strong) Weapon *weapon;
 
 @property (nonatomic) int health;
-@property (nonatomic, strong) Weapon *weapon;
+@property (nonatomic) int isActive;
 
 @end

@@ -22,6 +22,7 @@
 - (WorldPoint)gridPositionForTouchLocatoin:(CGPoint)touchLocation;
 - (void)updateGridForState:(WorldState *)state;
 - (void)updateDisplayPositionForWorldObject:(WorldObject *)object;
+- (void)updateSpriteForObject:(WorldObject *)object active:(BOOL)isActive;
 
 - (void)animateMovementPath:(NSArray *)path forObject:(WorldObject *)object completion:(void (^)())completionBlock;
 - (void)animateMovementPath:(NSArray *)movementPath withAnnotationPath:(NSArray *)annotationPath forObject:(WorldObject *)object completion:(void (^)())completionBlock;

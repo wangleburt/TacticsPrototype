@@ -88,6 +88,45 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
     sprite.center = spriteCenter(object.position);
 }
 
+- (void)updateSpriteForObject:(WorldObject *)object active:(BOOL)isActive
+{
+    UIImageView *sprite = [self.sprites objectForKey:object.key];
+    if (!sprite) {
+        return;
+    }
+    
+    UIImage *image = [UIImage imageNamed:object.imageFileName];
+    if (!isActive) {
+        image = [self convertImageToGreyscale:image];
+    }
+    sprite.image = image;
+}
+
+- (UIImage *)convertImageToGreyscale:(UIImage *)image
+{
+    CGRect imageRect = CGRectMake(0, 0, image.size.width, image.size.height);
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
+
+    CGBitmapInfo info = (CGBitmapInfo)kCGImageAlphaNone; // docs say this is safe
+    CGContextRef context = CGBitmapContextCreate(nil, image.size.width, image.size.height, 8, 0, colorSpace, info);
+
+    CGContextDrawImage(context, imageRect, [image CGImage]);
+    CGImageRef imageRef = CGBitmapContextCreateImage(context);
+
+    CGColorSpaceRelease(colorSpace);
+    CGContextRelease(context);
+
+    info = (CGBitmapInfo)kCGImageAlphaOnly; // docs say this is safe
+    context = CGBitmapContextCreate(nil, image.size.width, image.size.height, 8, 0, nil, info);
+    CGContextDrawImage(context, imageRect, [image CGImage]);
+    CGImageRef mask = CGBitmapContextCreateImage(context);
+
+    UIImage *newImage = [UIImage imageWithCGImage:CGImageCreateWithMask(imageRef, mask)];
+    CGImageRelease(imageRef);
+    CGImageRelease(mask);
+    return newImage;
+}
+
 - (void)animateMovementPath:(NSArray *)movementPath withAnnotationPath:(NSArray *)annotationPath forObject:(WorldObject *)object completion:(void (^)())completionBlock;
 {
     if (movementPath.count == 0) {

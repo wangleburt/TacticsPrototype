@@ -80,9 +80,11 @@
 {
     for (Character *dude in self.playerCharacters) {
         dude.movesRemaining = dude.characterClass.movement;
+        dude.isActive = YES;
     }
     for (Character *dude in self.enemyCharacters) {
         dude.movesRemaining = dude.characterClass.movement;
+        dude.isActive = NO;
     }
 }
 
@@ -94,6 +96,10 @@
             [self removeWorldObject:attack.defender];
         }
     }
+    
+    AttackModel *firstAttack = [combatModel.attacks firstObject];
+    firstAttack.attacker.isActive = NO;
+    firstAttack.attacker.movesRemaining = 0;
 }
 
 - (void)removeWorldObject:(WorldObject *)worldObject

@@ -10,6 +10,7 @@
 #import "PanelView.h"
 #import "CharacterInfoPanel.h"
 #import "CombatPreviewView.h"
+#import "BlockDrawingView.h"
 
 #import "WorldView.h"
 #import "WorldState.h"
@@ -37,6 +38,8 @@
 @property (nonatomic, strong) UIButton *gridLinesButton;
 @property (nonatomic, strong) UIButton *gridCoordsButton;
 
+@property (nonatomic, strong) UIView *endTurnView;
+
 @property (nonatomic, strong) UITapGestureRecognizer *tapRecognizer;
 
 @end
@@ -53,6 +56,7 @@
     [self setupState];
     [self setupWorldView];
     [self setupMenuPanel];
+    [self setupEndTurnButton];
     
     CharacterInfoPanel *panel = [[CharacterInfoPanel alloc] init];
     [panel updateForCharacter:nil];
@@ -185,7 +189,7 @@
         
         else {
             [self handleMoveSelection:attackOption.moveOption withCompletion:^{
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     [self presentAttackOption:attackOption onTarget:target];
                 });
             }];
@@ -210,7 +214,9 @@
     CombatModel *combatModel = [CombatModel combatModelFromPreview:preview withFirstAttacker:preview.player];
     [self.worldState applyCombat:combatModel];
     [self.worldView animateCombat:combatModel completion:^(CombatModel *model) {
-        
+        [self.worldView updateSpriteForObject:combatModel.playerCharacter active:combatModel.playerCharacter.isActive];
+        [self.worldView updateSpriteForObject:combatModel.enemyCharacter active:YES];
+        [self showEndTurnButton];
     }];
 }
 
@@ -222,6 +228,7 @@
     if (options.moveOptions.count == 1) {
         [self cleanupSelection];
         [self.worldView updateGridForState:self.worldState];
+        [self showEndTurnButton];
         if (completionBlock) {
             completionBlock();
         }
@@ -231,6 +238,7 @@
     else if ([moveOption isEqual:options.selectedMoveOption]) {
         [self cleanupSelection];
         [self.worldView updateGridForState:self.worldState];
+        [self showEndTurnButton];
         if (completionBlock) {
             completionBlock();
         }
@@ -268,6 +276,7 @@
     if (self.worldState.selectedObject && (!selectedObject || [selectedObject.key isEqualToString:self.worldState.selectedObject.key])) {
         [self cleanupSelection];
         [self.worldView updateGridForState:self.worldState];
+        [self showEndTurnButton];
     }
     
     // check new selection
@@ -279,8 +288,14 @@
         if ([selectedObject isKindOfClass:Character.class]) {
             Character *dude = (Character *)selectedObject;
             [self.characterInfoView updateForCharacter:dude];
-            CharacterWorldOptions *options = [[CharacterWorldOptions alloc] initWithCharacter:dude worldState:self.worldState];
-            self.worldState.characterWorldOptions = options;
+            
+            if (dude.isActive) {
+                CharacterWorldOptions *options = [[CharacterWorldOptions alloc] initWithCharacter:dude worldState:self.worldState];
+                self.worldState.characterWorldOptions = options;
+                [self hideEndTurnButton];
+            } else {
+                [self showEndTurnButton];
+            }
         } else {
             self.worldState.characterWorldOptions = nil;
         }
@@ -358,6 +373,90 @@
 
     NSString *title = self.worldState.gridLinesEnabled ? @"Hide Lines" : @"Show Lines";
     [self.gridLinesButton setTitle:title forState:UIControlStateNormal];
+}
+
+//----------------------------------------------------------------------------------
+#pragma mark - End Turn
+
+- (void)setupEndTurnButton
+{
+    CGFloat shadowOffset = 3;
+    CGFloat cornerRadius = 5;
+    
+    CGRect frame = (CGRect){CGPointZero, 150 + shadowOffset, 50 + shadowOffset};
+    frame.origin.x = CGRectGetMaxX(self.view.bounds) - frame.size.width - 5;
+    frame.origin.y = CGRectGetMaxY(self.view.bounds) - frame.size.height - 5;
+    BlockDrawingView *bgView = [[BlockDrawingView alloc] initWithFrame:frame];
+    bgView.backgroundColor = [UIColor clearColor];
+    bgView.drawBlock = ^void(CGRect rect) {
+        rect.size.width -= shadowOffset;
+        rect.size.height -= shadowOffset;
+        rect.origin.x += shadowOffset;
+        rect.origin.y += shadowOffset;
+        
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        CGContextSaveGState(context);
+        
+        UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:cornerRadius];
+        UIColor *shadowColor = [UIColor colorWithWhite:0 alpha:0.6];
+        CGContextSetFillColorWithColor(context, shadowColor.CGColor);
+        CGContextBeginPath(context);
+        CGContextAddPath(context, shadowPath.CGPath);
+        CGContextFillPath(context);
+        
+        CGContextRestoreGState(context);
+    };
+    [self.view addSubview:bgView];
+    self.endTurnView = bgView;
+    
+    CGRect buttonFrame = bgView.bounds;
+    buttonFrame.size.width -= shadowOffset;
+    buttonFrame.size.height -= shadowOffset;
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    button.frame = buttonFrame;
+    button.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:15];
+    [button setTitleColor:[UIColor colorWithWhite:1 alpha:0.9] forState:UIControlStateNormal];
+    [button setTitle:@"End Turn" forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(touchedEndTurnButton) forControlEvents:UIControlEventTouchUpInside];
+    button.backgroundColor = [UIColor colorWithRed:0.1 green:0.2 blue:1.0 alpha:1];
+    button.layer.borderColor = [UIColor colorWithRed:0.58 green:0.62 blue:0.94 alpha:1].CGColor;
+    button.layer.cornerRadius = cornerRadius;
+    button.layer.borderWidth = 2;
+    [bgView addSubview:button];
+}
+
+- (void)showEndTurnButton
+{
+    CGAffineTransform inTransorm = CGAffineTransformMakeTranslation(0, 0);
+    if (CGAffineTransformEqualToTransform(inTransorm, self.endTurnView.transform)) {
+        return;
+    }
+    
+    CGAffineTransform midTransform = CGAffineTransformMakeTranslation(-10, 0);
+    [UIView animateWithDuration:0.2 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+        self.endTurnView.transform = midTransform;
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:0.05 delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+            self.endTurnView.transform = inTransorm;
+        } completion:NULL];
+    }];
+}
+
+- (void)hideEndTurnButton
+{
+    CGAffineTransform outTransorm = CGAffineTransformMakeTranslation(200, 0);
+    if (CGAffineTransformEqualToTransform(outTransorm, self.endTurnView.transform)) {
+        return;
+    }
+    
+    [UIView animateWithDuration:0.2 animations:^{
+        self.endTurnView.transform = outTransorm;
+    }];
+}
+
+- (void)touchedEndTurnButton
+{
+
 }
 
 @end
