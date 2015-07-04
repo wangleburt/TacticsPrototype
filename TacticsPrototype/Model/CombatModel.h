@@ -2,30 +2,39 @@
 //  CombatModel.h
 //  TacticsPrototype
 //
-//  Created by Chris Meill on 6/29/15.
+//  Created by Chris Meill on 6/30/15.
 //  Copyright (c) 2015 Asgardian Games. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 
 @class Character;
+@class CombatPreview;
 
-@interface AttackPreveiw : NSObject
+typedef enum {
+    AttackRoll_Hit,
+    AttackRoll_Crit,
+    AttackRoll_Miss
+} AttackRoll;
 
+@interface AttackModel : NSObject
+
+@property (nonatomic, strong) Character *attacker;
+@property (nonatomic, strong) Character *defender;
+
+@property (nonatomic) AttackRoll roll;
 @property (nonatomic) int damage;
-@property (nonatomic) int hitChance;
-@property (nonatomic) int critChance;
+@property (nonatomic) BOOL isKill;
 
 @end
 
 @interface CombatModel : NSObject
 
-@property (nonatomic, strong, readonly) Character *player;
-@property (nonatomic, strong, readonly) Character *enemy;
+@property (nonatomic, strong) Character *playerCharacter;
+@property (nonatomic, strong) Character *enemyCharacter;
 
-@property (nonatomic, strong, readonly) AttackPreveiw *playerAttack;
-@property (nonatomic, strong, readonly) AttackPreveiw *enemyAttack;
+@property (nonatomic, strong) NSArray *attacks;
 
-- (instancetype)initWithPlayer:(Character *)player andEnemy:(Character *)enemy range:(int)range;
++ (instancetype)combatModelFromPreview:(CombatPreview *)preview withFirstAttacker:(Character *)firstAttacker;
 
 @end

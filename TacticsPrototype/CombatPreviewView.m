@@ -11,7 +11,7 @@
 
 #import "Character.h"
 #import "CharacterClass.h"
-#import "CombatModel.h"
+#import "CombatPreview.h"
 #import "Weapon.h"
 #import "WeaponElement.h"
 
@@ -31,7 +31,7 @@
 @property (nonatomic, strong) PreviewElementsPanel *playerPanel;
 @property (nonatomic, strong) PreviewElementsPanel *enemyPanel;
 
-@property (nonatomic, strong) CombatModel *combatModel;
+@property (nonatomic, strong) CombatPreview *combatPreview;
 
 @end
 
@@ -203,12 +203,12 @@
     return self;
 }
 
-- (void)updateWithCombatModel:(CombatModel *)model
+- (void)updateWithCombatPreview:(CombatPreview *)preview
 {
-    self.combatModel = model;
+    self.combatPreview = preview;
     
-    [self.enemyPanel updateWithAttack:model.enemyAttack fromCharacter:model.enemy];
-    [self.playerPanel updateWithAttack:model.playerAttack fromCharacter:model.player];
+    [self.enemyPanel updateWithAttack:preview.enemyAttack fromCharacter:preview.enemy];
+    [self.playerPanel updateWithAttack:preview.playerAttack fromCharacter:preview.player];
     
     void (^setCompImage)(UIImageView *, ElementComparison) = ^void(UIImageView *imageView, ElementComparison comp)
     {
@@ -225,10 +225,10 @@
         }
     };
     
-    ElementComparison playerComp = [model.player.weapon.element compareAgainstElement:model.enemy.weapon.element];
+    ElementComparison playerComp = [preview.player.weapon.element compareAgainstElement:preview.enemy.weapon.element];
     setCompImage(self.playerAdvantageIcon, playerComp);
     
-    ElementComparison enemyComp = [model.enemy.weapon.element compareAgainstElement:model.player.weapon.element];
+    ElementComparison enemyComp = [preview.enemy.weapon.element compareAgainstElement:preview.player.weapon.element];
     setCompImage(self.enemyAdvantageIcon, enemyComp);
 }
 
@@ -242,7 +242,7 @@
 - (void)touchedConfirm
 {
     if (self.confirmBlock) {
-        self.confirmBlock(self.combatModel);
+        self.confirmBlock(self.combatPreview);
     }
 }
 

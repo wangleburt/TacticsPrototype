@@ -12,20 +12,20 @@
 @class WorldLevel;
 @class WorldState;
 @class WorldObject;
+@class CombatModel;
 
 @interface WorldView : UIView
 
 - (instancetype)initWithLevel:(WorldLevel *)level;
 - (void)loadSpritesFromState:(WorldState *)state;
 
+- (WorldPoint)gridPositionForTouchLocatoin:(CGPoint)touchLocation;
 - (void)updateGridForState:(WorldState *)state;
-
 - (void)updateDisplayPositionForWorldObject:(WorldObject *)object;
 
 - (void)animateMovementPath:(NSArray *)path forObject:(WorldObject *)object completion:(void (^)())completionBlock;
-
 - (void)animateMovementPath:(NSArray *)movementPath withAnnotationPath:(NSArray *)annotationPath forObject:(WorldObject *)object completion:(void (^)())completionBlock;
 
-- (WorldPoint)gridPositionForTouchLocatoin:(CGPoint)touchLocation;
+- (void)animateCombat:(CombatModel *)combatModel completion:(void (^)(CombatModel *))completionBlock;
 
 @end

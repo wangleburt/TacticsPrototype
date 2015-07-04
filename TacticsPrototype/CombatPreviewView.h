@@ -8,13 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
-@class CombatModel;
+@class CombatPreview;
 
 @interface CombatPreviewView : UIView
 
 @property (nonatomic, copy) void (^cancelBlock)();
-@property (nonatomic, copy) void (^confirmBlock)(CombatModel *);
+@property (nonatomic, copy) void (^confirmBlock)(CombatPreview *);
 
-- (void)updateWithCombatModel:(CombatModel *)model;
+- (void)updateWithCombatPreview:(CombatPreview *)preview;
 
 @end

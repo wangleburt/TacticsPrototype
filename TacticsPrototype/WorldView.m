@@ -10,6 +10,8 @@
 #import "WorldLevel.h"
 #import "WorldState.h"
 #import "WorldObject.h"
+#import "CombatModel.h"
+#import "Character.h"
 
 #import "GridOverlayView.h"
 #import "GridOverlayDisplay.h"
@@ -142,6 +144,117 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
             completionBlock();
         }
     }
+}
+
+//--------------------------------------------------------------------------------------
+#pragma mark - Attacks
+
+- (void)animateCombat:(CombatModel *)combatModel completion:(void (^)(CombatModel *))completionBlock
+{
+    [self animateAttacks:combatModel.attacks completion:^{
+        if (completionBlock) {
+            completionBlock(combatModel);
+        }
+    }];
+}
+
+- (void)animateAttacks:(NSArray *)attacks completion:(void (^)())completionBlock
+{
+    if (!attacks || attacks.count == 0) {
+        if (completionBlock) {
+            completionBlock();
+        }
+        return;
+    }
+    
+    AttackModel *attack = [attacks firstObject];
+    [self animateAttack:attack completion:^{
+        NSRange range = NSMakeRange(1, attacks.count-1);
+        NSArray *remaining = [attacks objectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range]];
+        [self animateAttacks:remaining completion:completionBlock];
+    }];
+}
+
+- (void)animateAttack:(AttackModel *)attackModel completion:(void (^)())completionBlock
+{
+    UILabel *attackerLabel = nil;
+    if (attackModel.roll != AttackRoll_Hit) {
+        attackerLabel = [[UILabel alloc] init];
+        attackerLabel.backgroundColor = [UIColor clearColor];
+        attackerLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:15];
+        attackerLabel.textColor = [UIColor blueColor];
+        if (attackModel.roll == AttackRoll_Crit) {
+            attackerLabel.text = @"CRIT!";
+        } else if (attackModel.roll == AttackRoll_Miss) {
+            attackerLabel.text = @"MISS!";
+        }
+        [attackerLabel sizeToFit];
+    }
+    
+    UILabel *defenderLabel = nil;
+    if (attackModel.roll == AttackRoll_Hit) {
+        defenderLabel = [[UILabel alloc] init];
+        defenderLabel.backgroundColor = [UIColor clearColor];
+        defenderLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:15];
+        defenderLabel.textColor = [UIColor redColor];
+        defenderLabel.text = [NSString stringWithFormat:@"-%i", attackModel.damage];
+        [defenderLabel sizeToFit];
+    }
+    
+    UIView *attackerSprite = [self.sprites objectForKey:attackModel.attacker.key];
+    UIView *defenderSprite = [self.sprites objectForKey:attackModel.defender.key];
+    
+    CGPoint attackerStart = attackerSprite.center;
+    CGPoint attackerEnd = defenderSprite.center;
+    
+    CGPoint delta = (CGPoint){attackerEnd.x-attackerStart.x, attackerEnd.y-attackerStart.y};
+    CGFloat distance = sqrt(delta.x*delta.x + delta.y*delta.y);
+    CGFloat desiredDistance = kWorldGridUnitSize / 4;
+    CGFloat ratio = desiredDistance/distance;
+    delta = (CGPoint){delta.x*ratio, delta.y*ratio};
+    attackerEnd = (CGPoint){attackerStart.x + delta.x, attackerStart.y + delta.y};
+    
+    if (attackModel.roll == AttackRoll_Crit) {
+        [self animateLabel:attackerLabel overSprite:attackerSprite];
+    }
+    [UIView animateWithDuration:0.2 animations:^{
+        attackerSprite.center = attackerEnd;
+    } completion:^(BOOL finished) {
+        if (attackModel.roll == AttackRoll_Miss) {
+            [self animateLabel:attackerLabel overSprite:attackerSprite];
+        } else {
+            [self animateLabel:defenderLabel overSprite:defenderSprite];
+        }
+        [UIView animateWithDuration:0.5 animations:^{
+            attackerSprite.center = attackerStart;
+            if (attackModel.isKill) {
+                defenderSprite.alpha = 0.0f;
+            }
+        } completion:^(BOOL finished) {
+            if (attackModel.isKill) {
+                [defenderSprite removeFromSuperview];
+                [self.sprites removeObjectForKey:attackModel.defender.key];
+            }
+            if (completionBlock) {
+                completionBlock();
+            }
+        }];
+    }];
+}
+
+- (void)animateLabel:(UILabel *)label overSprite:(UIView *)sprite
+{
+    CGPoint center = sprite.center;
+    center.y -= kWorldGridUnitSize / 2;
+    label.center = center;
+    
+    [self.spriteView addSubview:label];
+    [UIView animateWithDuration:1 animations:^{
+        label.alpha = 0;
+        label.center = (CGPoint){center.x, center.y - kWorldGridUnitSize/2};
+    } completion:^(BOOL finished) {
+        [label removeFromSuperview];
+    }];
 }
 
 //--------------------------------------------------------------------------------------

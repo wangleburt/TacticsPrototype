@@ -19,6 +19,7 @@
 #import "Character.h"
 #import "CharacterClass.h"
 #import "CharacterWorldOptions.h"
+#import "CombatPreview.h"
 #import "CombatModel.h"
 
 @interface WorldViewController () <UIScrollViewDelegate>
@@ -67,9 +68,9 @@
     combatPreview.cancelBlock = ^void() {
         weakSelf.combatPreview.hidden = YES;
     };
-    combatPreview.confirmBlock = ^void(CombatModel *model) {
+    combatPreview.confirmBlock = ^void(CombatPreview *preview) {
         weakSelf.combatPreview.hidden = YES;
-        [weakSelf performAttackWithCombatModel:model];
+        [weakSelf performAttackWithCombatPreview:preview];
     };
     [self.view addSubview:combatPreview];
     self.combatPreview = combatPreview;
@@ -184,7 +185,9 @@
         
         else {
             [self handleMoveSelection:attackOption.moveOption withCompletion:^{
-                [self presentAttackOption:attackOption onTarget:target];
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [self presentAttackOption:attackOption onTarget:target];
+                });
             }];
         }
     }
@@ -194,16 +197,20 @@
 {
     CharacterWorldOptions *options = self.worldState.characterWorldOptions;
     int range = WorldPointRangeToPoint(attack.moveOption.position, attack.position);
-    CombatModel *combatModel = [[CombatModel alloc] initWithPlayer:options.character andEnemy:target range:range];
-    [self.combatPreview updateWithCombatModel:combatModel];
+    CombatPreview *preview = [[CombatPreview alloc] initWithPlayer:options.character andEnemy:target range:range];
+    [self.combatPreview updateWithCombatPreview:preview];
     self.combatPreview.hidden = NO;
 }
 
-- (void)performAttackWithCombatModel:(CombatModel *)combatModel
+- (void)performAttackWithCombatPreview:(CombatPreview *)preview
 {
     [self cleanupSelection];
+    [self.worldView updateGridForState:self.worldState];
     
-    
+    CombatModel *model = [CombatModel combatModelFromPreview:preview withFirstAttacker:preview.player];
+    [self.worldView animateCombat:model completion:^(CombatModel *model) {
+        
+    }];
 }
 
 - (void)handleMoveSelection:(CharacterMovementOption *)moveOption withCompletion:(void (^)())completionBlock

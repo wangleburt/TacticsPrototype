@@ -2,75 +2,84 @@
 //  CombatModel.m
 //  TacticsPrototype
 //
-//  Created by Chris Meill on 6/29/15.
+//  Created by Chris Meill on 6/30/15.
 //  Copyright (c) 2015 Asgardian Games. All rights reserved.
 //
 
 #import "CombatModel.h"
+#import "CombatPreview.h"
+
 #import "Character.h"
-#import "CharacterClass.h"
-#import "Weapon.h"
-#import "WeaponElement.h"
-
-@interface CombatModel ()
-
-@property (nonatomic, strong) Character *player;
-@property (nonatomic, strong) Character *enemy;
-
-@property (nonatomic, strong) AttackPreveiw *playerAttack;
-@property (nonatomic, strong) AttackPreveiw *enemyAttack;
-
-@end
 
 @implementation CombatModel
 
-- (instancetype)initWithPlayer:(Character *)player andEnemy:(Character *)enemy range:(int)range
++ (instancetype)combatModelFromPreview:(CombatPreview *)preview withFirstAttacker:(Character *)firstAttacker
 {
-    self = [super init];
-    if (self) {
-        self.player = player;
-        self.enemy = enemy;
-        
-        self.playerAttack = [self attackWithAttacker:player defender:enemy range:range];
-        self.enemyAttack = [self attackWithAttacker:enemy defender:player range:range];
-    }
-    return self;
-}
-
-- (AttackPreveiw *)attackWithAttacker:(Character *)attacker defender:(Character *)defender range:(int)range
-{
-    if (range < attacker.characterClass.attackRangeMin || range > attacker.characterClass.attackRangeMax) {
-        return nil;
-    }
+    CombatModel *model = [[CombatModel alloc] init];
+    model.playerCharacter = preview.player;
+    model.enemyCharacter = preview.enemy;
     
-    AttackPreveiw *attack = [[AttackPreveiw alloc] init];
-    
-    int baseDamage = attacker.weapon.damage;
-    // TODO: modify base damage with atk/def, magic/res
-    
-    int baseHit = 70;
-    // TODO: modify base hit with acc/dodge
-
-    ElementComparison comp = [attacker.weapon.element compareAgainstElement:defender.weapon.element];
-    if (comp == ElementComparison_Advantage) {
-        attack.damage = baseDamage * 1.5;
-        attack.hitChance = MAX(0, MIN(100, baseHit * 1.5));
-    } else if (comp == ElementComparison_Disadvantage) {
-        attack.damage = baseDamage * 0.6;
-        attack.hitChance = MAX(0, MIN(100, baseHit * 0.6));
+    Character *secondCharacter = nil;
+    AttackPreveiw *firstPreview = nil, *secondPreview = nil;
+    if ([firstAttacker isEqual:preview.player]) {
+        secondCharacter = preview.enemy;
+        firstPreview = preview.playerAttack;
+        secondPreview = preview.enemyAttack;
     } else {
-        attack.damage = baseDamage;
-        attack.hitChance = baseHit;
+        secondCharacter = preview.player;
+        firstPreview = preview.enemyAttack;
+        secondPreview = preview.playerAttack;
     }
     
-    int baseCrit = 5;
-    // TODO: modify crit with stats
-    attack.critChance = baseCrit;
+    AttackModel* (^attackModel)(Character*, Character*, AttackPreveiw*) = ^AttackModel*(Character *attacker, Character *defender, AttackPreveiw *preview)
+    {
+        if (!preview) {
+            return nil;
+        }
+        
+        AttackModel *attackModel = [[AttackModel alloc] init];
+        attackModel.attacker = attacker;
+        attackModel.defender = defender;
+        int hitChance = arc4random() % 101;
+        if (hitChance <= preview.hitChance) {
+            int critChance = arc4random() % 101;
+            if (critChance <= preview.critChance) {
+                attackModel.roll = AttackRoll_Crit;
+                attackModel.damage = preview.damage * 2;
+            } else {
+                attackModel.roll = AttackRoll_Hit;
+                attackModel.damage = preview.damage;
+            }
+        } else {
+            attackModel.roll = AttackRoll_Miss;
+            attackModel.damage = 0;
+        }
+        attackModel.isKill = NO;
+        return attackModel;
+    };
     
-    return attack;
+    NSMutableArray *attacks = [NSMutableArray array];
+    AttackModel *firstAttack = attackModel(firstAttacker, secondCharacter, firstPreview);
+    [attacks addObject:firstAttack];
+    
+    if (secondCharacter.health > firstAttack.damage) {
+        AttackModel *secondAttack = attackModel(secondCharacter, firstAttacker, secondPreview);
+        if (secondAttack) {
+            if (firstAttacker.health <= secondAttack.damage) {
+                secondAttack.isKill = YES;
+            }
+            [attacks addObject:secondAttack];
+        }
+        
+    } else {
+        firstAttack.isKill = YES;
+    }
+    
+    model.attacks = attacks;
+    return model;
 }
 
 @end
 
-@implementation AttackPreveiw
+@implementation AttackModel
 @end
