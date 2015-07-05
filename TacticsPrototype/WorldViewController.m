@@ -102,8 +102,16 @@
 {
     [self.worldState setupForNewTurn];
     [self resetSpriteActiveState];
-    self.tapRecognizer.enabled = YES;
-    self.endTurnArrow.hidden = NO;
+    
+    Character *dude = [self.worldState.playerCharacters firstObject];
+    NSArray *path = @[[NSValue valueWithWorldPoint:dude.position]];
+    CGRect visibleRect = [self.worldView visibleRectForMovementPath:path];
+    [self scrollToRect:visibleRect completion:^{
+        [self animateTurnTitle:@"turn-icon-human" completion:^{
+            self.tapRecognizer.enabled = YES;
+            self.endTurnArrow.hidden = NO;
+        }];
+    }];
 }
 
 - (void)startEnemyTurn
@@ -114,13 +122,68 @@
     self.endTurnArrow.hidden = YES;
     [self hideEndTurnButtonAnimated:YES];
     
-    [self performNextActionFromAI:[self.worldState enemyAiForEnemyTurn]];
+    [self animateTurnTitle:@"turn-icon-orc" completion:^{
+        [self performNextActionFromAI:[self.worldState enemyAiForEnemyTurn]];
+    }];
 }
 
 - (void)resetSpriteActiveState
 {
     for (WorldObject *object in self.worldState.worldObjects) {
         [self.worldView updateSpriteForObject:object active:YES];
+    }
+}
+
+- (void)animateTurnTitle:(NSString *)turnImageName completion:(void (^)())completionBlock
+{
+    CGRect imageRect = self.view.bounds;
+    imageRect.size.height = 50;
+    imageRect.origin.y = CGRectGetMidY(self.view.bounds) - CGRectGetHeight(imageRect)/2;
+    imageRect.origin.x = CGRectGetMaxX(self.view.bounds);
+    
+    UIImageView *titleImage = [[UIImageView alloc] initWithFrame:imageRect];
+    titleImage.backgroundColor = [UIColor clearColor];
+    titleImage.contentMode = UIViewContentModeScaleAspectFit;
+    titleImage.image = [UIImage imageNamed:turnImageName];
+    [self.view addSubview:titleImage];
+    
+    [UIView animateWithDuration:0.3f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+        CGRect frame = imageRect;
+        frame.origin.x = 0;
+        titleImage.frame = frame;
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:0.3f delay:0.3f options:UIViewAnimationOptionCurveEaseIn animations:^{
+            CGRect frame = imageRect;
+            frame.origin.x = -frame.size.width;
+            titleImage.frame = frame;
+        } completion:^(BOOL finished) {
+            if (completionBlock) {
+                completionBlock();
+            }
+        }];
+    }];
+}
+
+- (void)scrollToRect:(CGRect)rect completion:(void (^)())completionBlock
+{
+    CGRect visibleRect = self.worldScrollView.bounds;
+    if (CGRectContainsRect(visibleRect, rect)) {
+        if (completionBlock) {
+            completionBlock();
+        }
+    } else {
+        CGFloat widthDiff = visibleRect.size.width - rect.size.width;
+        CGFloat heightDiff = visibleRect.size.height - rect.size.height;
+        CGRect scrollRect = CGRectInset(rect, -widthDiff/2, -heightDiff/2);
+        scrollRect.origin.x = MAX(0, MIN(self.worldScrollView.contentSize.width - scrollRect.size.width, scrollRect.origin.x));
+        scrollRect.origin.y = MAX(0, MIN(self.worldScrollView.contentSize.height - scrollRect.size.height, scrollRect.origin.y));
+        [UIView animateWithDuration:0.3 animations:^{
+            self.worldScrollView.bounds = scrollRect;
+        } completion:^(BOOL finished) {
+            if (completionBlock) {
+                completionBlock();
+            }
+        }];
     }
 }
 
@@ -376,35 +439,42 @@
         return;
     }
     
-    CGRect visibleRect = self.worldScrollView.bounds;
+    self.worldState.selectedObject = action.character;
+    [self.worldView updateGridForState:self.worldState];
+    
     CGRect pathRect = [self.worldView visibleRectForMovementPath:action.move.path];
-    if (CGRectContainsRect(visibleRect, pathRect)) {
+    [self scrollToRect:pathRect completion:^{
         [self animateMoveFromAction:action forAI:enemyAI];
-    } else {
-        CGFloat widthDiff = visibleRect.size.width - pathRect.size.width;
-        CGFloat heightDiff = visibleRect.size.height - pathRect.size.height;
-        CGRect scrollRect = CGRectInset(pathRect, -widthDiff/2, -heightDiff/2);
-        scrollRect.origin.x = MAX(0, MIN(self.worldScrollView.contentSize.width - scrollRect.size.width, scrollRect.origin.x));
-        scrollRect.origin.y = MAX(0, MIN(self.worldScrollView.contentSize.height - scrollRect.size.height, scrollRect.origin.y));
-        [UIView animateWithDuration:0.3 animations:^{
-            self.worldScrollView.bounds = scrollRect;
-        } completion:^(BOOL finished) {
-            [self animateMoveFromAction:action forAI:enemyAI];
-        }];
-    }
+    }];
 }
 
 - (void)animateMoveFromAction:(EnemyAction *)action forAI:(EnemyAI *)enemyAI
 {
-    [self.worldView animateMovementPath:action.move.path forObject:action.character completion:^{
-        action.character.position = action.move.position;
-        action.character.movesRemaining -= action.move.path.count-1;
-        if (action.attack) {
-            [self animateAttackFromAction:action forAI:enemyAI];
-        } else {
-            [self performNextActionFromAI:enemyAI];
-        }
-    }];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^
+    {
+        self.worldState.selectedObject = nil;
+        [self.worldView updateGridForState:self.worldState];
+        
+        [self.worldView animateMovementPath:action.move.path forObject:action.character completion:^{
+            action.character.position = action.move.position;
+            action.character.movesRemaining -= action.move.path.count-1;
+
+            if (action.attack) {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^
+                {
+                    [self animateAttackFromAction:action forAI:enemyAI];
+                });
+            } else {
+                action.character.isActive = NO;
+                [self.worldView updateSpriteForObject:action.character active:NO];
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^
+                {
+                    [self performNextActionFromAI:enemyAI];
+                });
+            }
+            
+        }];
+    });
 }
 
 - (void)animateAttackFromAction:(EnemyAction *)action forAI:(EnemyAI *)enemyAI
