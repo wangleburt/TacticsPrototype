@@ -114,6 +114,26 @@
     dude.weapon.element = [ContentManager contentWithKey:@"element_none"];
     [characters addObject:dude];
     
+    dude = [[Character alloc] init];
+    dude.characterClass = [ContentManager contentWithKey:@"class_grunt"];
+    dude.position = (WorldPoint){9, 1};
+    dude.team = CharacterTeam_Enemy;
+    dude.key = @"grunt2";
+    dude.weapon = [[Weapon alloc] init];
+    dude.weapon.damage = 5;
+    dude.weapon.element = [ContentManager contentWithKey:@"element_none"];
+    [characters addObject:dude];
+    
+    dude = [[Character alloc] init];
+    dude.characterClass = [ContentManager contentWithKey:@"class_grunt"];
+    dude.position = (WorldPoint){10, 0};
+    dude.team = CharacterTeam_Enemy;
+    dude.key = @"grunt3";
+    dude.weapon = [[Weapon alloc] init];
+    dude.weapon.damage = 5;
+    dude.weapon.element = [ContentManager contentWithKey:@"element_none"];
+    [characters addObject:dude];
+    
     level.characters = characters;
     
     return level;

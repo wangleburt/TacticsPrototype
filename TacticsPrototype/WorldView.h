@@ -24,6 +24,7 @@
 - (void)updateDisplayPositionForWorldObject:(WorldObject *)object;
 - (void)updateSpriteForObject:(WorldObject *)object active:(BOOL)isActive;
 
+- (CGRect)visibleRectForMovementPath:(NSArray *)path;
 - (void)animateMovementPath:(NSArray *)path forObject:(WorldObject *)object completion:(void (^)())completionBlock;
 - (void)animateMovementPath:(NSArray *)movementPath withAnnotationPath:(NSArray *)annotationPath forObject:(WorldObject *)object completion:(void (^)())completionBlock;
 

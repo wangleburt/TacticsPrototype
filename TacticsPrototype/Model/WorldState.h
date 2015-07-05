@@ -16,6 +16,7 @@
 @class CharacterWorldOptions;
 @class CombatModel;
 @class Character;
+@class EnemyAI;
 
 @interface WorldState : NSObject
 
@@ -34,8 +35,9 @@
 
 - (instancetype)initWithLevel:(WorldLevel *)level;
 
-- (void)startPlayerTurn;
+- (void)setupForNewTurn;
 - (BOOL)playerHasActiveCharacters;
+- (EnemyAI *)enemyAiForEnemyTurn;
 
 - (GridOverlayDisplay *)currentGridOverlayDisplay;
 - (WorldObject *)objectAtPosition:(WorldPoint)position;

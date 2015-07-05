@@ -17,6 +17,7 @@
 #import "CharacterClass.h"
 #import "CharacterWorldOptions.h"
 #import "CombatModel.h"
+#import "EnemyAI.h"
 
 @interface WorldState ()
 
@@ -81,7 +82,7 @@
     return nil;
 }
 
-- (void)startPlayerTurn
+- (void)setupForNewTurn
 {
     for (Character *dude in self.mutablePlayerCharacters) {
         dude.movesRemaining = dude.characterClass.movement;
@@ -169,6 +170,11 @@
     }
 
     return NO;
+}
+
+- (EnemyAI *)enemyAiForEnemyTurn
+{
+    return [[EnemyAI alloc] initWithCharacters:self.enemyCharacters worldState:self];
 }
 
 //-------------------------------------------------------------------------------------

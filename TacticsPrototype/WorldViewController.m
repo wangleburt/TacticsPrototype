@@ -22,6 +22,7 @@
 #import "CharacterWorldOptions.h"
 #import "CombatPreview.h"
 #import "CombatModel.h"
+#import "EnemyAI.h"
 
 @interface WorldViewController () <UIScrollViewDelegate>
 
@@ -94,13 +95,33 @@
 {
     [super viewDidAppear:animated];
     
-    [self startGame];
+    [self startPlayerTurn];
 }
 
-- (void)startGame
+- (void)startPlayerTurn
 {
-    [self.worldState startPlayerTurn];
+    [self.worldState setupForNewTurn];
+    [self resetSpriteActiveState];
     self.tapRecognizer.enabled = YES;
+    self.endTurnArrow.hidden = NO;
+}
+
+- (void)startEnemyTurn
+{
+    [self.worldState setupForNewTurn];
+    [self resetSpriteActiveState];
+    self.tapRecognizer.enabled = NO;
+    self.endTurnArrow.hidden = YES;
+    [self hideEndTurnButtonAnimated:YES];
+    
+    [self performNextActionFromAI:[self.worldState enemyAiForEnemyTurn]];
+}
+
+- (void)resetSpriteActiveState
+{
+    for (WorldObject *object in self.worldState.worldObjects) {
+        [self.worldView updateSpriteForObject:object active:YES];
+    }
 }
 
 - (NSUInteger) supportedInterfaceOrientations
@@ -218,9 +239,6 @@
         [self.worldView updateSpriteForObject:combatModel.playerCharacter active:combatModel.playerCharacter.isActive];
         [self.worldView updateSpriteForObject:combatModel.enemyCharacter active:YES];
         [self doubleCheckActivePlayerCharacters];
-        if (![self.worldState playerHasActiveCharacters]) {
-            [self showEndTurnButton];
-        }
     }];
 }
 
@@ -233,6 +251,9 @@
                 [self.worldView updateSpriteForObject:dude active:NO];
             }
         }
+    }
+    if (![self.worldState playerHasActiveCharacters]) {
+        [self showEndTurnButton];
     }
 }
 
@@ -305,7 +326,9 @@
             if (dude.isActive) {
                 CharacterWorldOptions *options = [[CharacterWorldOptions alloc] initWithCharacter:dude worldState:self.worldState];
                 self.worldState.characterWorldOptions = options;
-                [self hideEndTurnButtonAnimated:YES];
+                if (dude.team == CharacterTeam_Player) {
+                    [self hideEndTurnButtonAnimated:YES];
+                }
             }
         } else {
             self.worldState.characterWorldOptions = nil;
@@ -324,10 +347,7 @@
             Character *character = options.character;
             character.position = moveOption.position;
             character.movesRemaining -= moveOption.path.count-1;
-            if (![self.worldState characterHasActionOptions:character]) {
-                character.isActive = NO;
-                [self.worldView updateSpriteForObject:character active:NO];
-            }
+            [self doubleCheckActivePlayerCharacters];
         }
     }
     self.worldState.selectedObject = nil;
@@ -338,6 +358,70 @@
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
 {
     return self.worldView;
+}
+
+//----------------------------------------------------------------------------------
+#pragma mark - Enemy Turn
+
+- (void)performNextActionFromAI:(EnemyAI *)enemyAI
+{
+    EnemyAction *action = [enemyAI nextAction];
+    if (!action) {
+        [self startPlayerTurn];
+        return;
+    }
+    
+    if (!action.move) {
+        [self performNextActionFromAI:enemyAI];
+        return;
+    }
+    
+    CGRect visibleRect = self.worldScrollView.bounds;
+    CGRect pathRect = [self.worldView visibleRectForMovementPath:action.move.path];
+    if (CGRectContainsRect(visibleRect, pathRect)) {
+        [self animateMoveFromAction:action forAI:enemyAI];
+    } else {
+        CGFloat widthDiff = visibleRect.size.width - pathRect.size.width;
+        CGFloat heightDiff = visibleRect.size.height - pathRect.size.height;
+        CGRect scrollRect = CGRectInset(pathRect, -widthDiff/2, -heightDiff/2);
+        scrollRect.origin.x = MAX(0, MIN(self.worldScrollView.contentSize.width - scrollRect.size.width, scrollRect.origin.x));
+        scrollRect.origin.y = MAX(0, MIN(self.worldScrollView.contentSize.height - scrollRect.size.height, scrollRect.origin.y));
+        [UIView animateWithDuration:0.3 animations:^{
+            self.worldScrollView.bounds = scrollRect;
+        } completion:^(BOOL finished) {
+            [self animateMoveFromAction:action forAI:enemyAI];
+        }];
+    }
+}
+
+- (void)animateMoveFromAction:(EnemyAction *)action forAI:(EnemyAI *)enemyAI
+{
+    [self.worldView animateMovementPath:action.move.path forObject:action.character completion:^{
+        action.character.position = action.move.position;
+        action.character.movesRemaining -= action.move.path.count-1;
+        if (action.attack) {
+            [self animateAttackFromAction:action forAI:enemyAI];
+        } else {
+            [self performNextActionFromAI:enemyAI];
+        }
+    }];
+}
+
+- (void)animateAttackFromAction:(EnemyAction *)action forAI:(EnemyAI *)enemyAI
+{
+    CharacterAttackOption *attack = action.attack;
+    int range = WorldPointRangeToPoint(attack.moveOption.position, attack.position);
+    Character *player = (Character *)[self.worldState objectAtPosition:attack.position];
+    CombatPreview *preview = [[CombatPreview alloc] initWithPlayer:player andEnemy:action.character range:range];
+    CombatModel *combatModel = [CombatModel combatModelFromPreview:preview withFirstAttacker:preview.enemy];
+    
+    [self.worldState applyCombat:combatModel];
+    [self.worldView animateCombat:combatModel completion:^(CombatModel *model) {
+        [self.worldView updateSpriteForObject:combatModel.playerCharacter active:YES];
+        [self.worldView updateSpriteForObject:combatModel.enemyCharacter active:combatModel.enemyCharacter.isActive];
+        [self performNextActionFromAI:enemyAI];
+    }];
+
 }
 
 //----------------------------------------------------------------------------------
@@ -532,7 +616,10 @@
 
 - (void)touchedEndTurnButton
 {
-
+    [self cleanupSelection];
+    [self.worldView updateGridForState:self.worldState];
+    
+    [self startEnemyTurn];
 }
 
 @end

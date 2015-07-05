@@ -127,6 +127,25 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
     return newImage;
 }
 
+//--------------------------------------------------------------------------------------
+#pragma mark - Movement
+
+- (CGRect)visibleRectForMovementPath:(NSArray *)path
+{
+    WorldPoint startPosition = [[path firstObject] worldPointValue];
+    WorldPoint endPosition = [[path lastObject] worldPointValue];
+    
+    CGPoint startPoint = (CGPoint){startPosition.x*kWorldGridUnitSize, startPosition.y*kWorldGridUnitSize};
+    CGPoint endPoint = (CGPoint){endPosition.x*kWorldGridUnitSize, endPosition.y*kWorldGridUnitSize};
+    
+    CGRect visibleRect = CGRectZero;
+    visibleRect.origin.x = MIN(startPoint.x, endPoint.x);
+    visibleRect.size.width = kWorldGridUnitSize + fabs(startPoint.x - endPoint.x);
+    visibleRect.origin.y = MIN(startPoint.y, endPoint.y);
+    visibleRect.size.height = kWorldGridUnitSize + fabs(startPoint.y - endPoint.y);
+    return visibleRect;
+}
+
 - (void)animateMovementPath:(NSArray *)movementPath withAnnotationPath:(NSArray *)annotationPath forObject:(WorldObject *)object completion:(void (^)())completionBlock;
 {
     if (movementPath.count == 0) {
