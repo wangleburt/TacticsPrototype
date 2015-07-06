@@ -131,7 +131,8 @@
         return action;
     }
     
-    return nil;
+    // still noting? okay just move to the next guy
+    return [self nextAction];
 }
 
 - (CharacterAttackOption *)bestAttackFromOptions:(CharacterWorldOptions *)options
