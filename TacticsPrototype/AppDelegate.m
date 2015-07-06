@@ -7,7 +7,7 @@
 //
 
 #import "AppDelegate.h"
-#import "WorldViewController.h"
+#import "LevelSetupViewController.h"
 
 @interface AppDelegate ()
 
@@ -21,7 +21,7 @@
     CGRect bounds = [UIScreen mainScreen].bounds;
     self.window = [[UIWindow alloc] initWithFrame:bounds];
     
-    UIViewController *root = [[WorldViewController alloc] init];
+    UIViewController *root = [[LevelSetupViewController alloc] init];
     self.window.rootViewController = root;
     [self.window makeKeyAndVisible];
     

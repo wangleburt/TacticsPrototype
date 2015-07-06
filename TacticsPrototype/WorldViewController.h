@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
+@class WorldLevel;
+
 @interface WorldViewController : UIViewController
+
+- (instancetype)initWithLevel:(WorldLevel *)level;
 
 @end

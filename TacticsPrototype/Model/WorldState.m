@@ -199,6 +199,15 @@
             }
         }
     }
+
+/********** UNCOMMENT TO HIGHLIGHT BLOCKED TILES ************/
+//    for (int i=0; i<self.gridDimensions.width; i++) {
+//        for (int j=0; j<self.gridDimensions.height; j++) {
+//            if (self.level.terrainTiles[i][j].blocked) {
+//                display[i][j] = [GridOverlayTileDisplay redTile];
+//            }
+//        }
+//    }
     
     return display;
 }

@@ -7,7 +7,11 @@
 //
 
 #import "EnemyAI.h"
+
 #import "WorldState.h"
+#import "WorldLevel.h"
+#import "TerrainMap.h"
+
 #import "Character.h"
 #import "CharacterWorldOptions.h"
 
@@ -22,6 +26,8 @@
 
 @property (nonatomic) int pathLength;
 @property (nonatomic) WorldPoint position;
+@property (nonatomic) int heuristicValue;
+
 @property (nonatomic, strong) CharacterMovementOption *baseMovement;
 
 @end
@@ -45,6 +51,10 @@
 {
     NSMutableArray *characterOrder = [NSMutableArray array];
     NSMutableSet *remainingCharacters = [NSMutableSet setWithArray:characters];
+    
+    if (characters.count == 0) {
+        return characterOrder;
+    }
     
     Character *last = [self firstCharacterInArray:characters];
     [characterOrder addObject:last];
@@ -158,18 +168,6 @@
     NSMutableArray *partialPaths = [NSMutableArray array];
     NSMutableSet *pointsConsidered = [NSMutableSet set];
     
-    for (CharacterMovementOption *move in options.moveOptions) {
-        if (move.path.count == options.character.movesRemaining+1) {
-            PathfinderHelper *helper = [[PathfinderHelper alloc] init];
-            helper.pathLength = (int)move.path.count;
-            helper.baseMovement = move;
-            helper.position = move.position;
-            [partialPaths addObject:helper];
-        } else {
-            [pointsConsidered addObject:[NSValue valueWithWorldPoint:move.position]];
-        }
-    }
-    
     int (^heuristic)(PathfinderHelper *) = ^int(PathfinderHelper *helper) {
         int closest = INT_MAX;
         for (Character *player in self.worldState.playerCharacters) {
@@ -177,9 +175,23 @@
         }
         return closest + helper.pathLength;
     };
+    
+    for (CharacterMovementOption *move in options.moveOptions) {
+        if (move.path.count == options.character.movesRemaining+1) {
+            PathfinderHelper *helper = [[PathfinderHelper alloc] init];
+            helper.pathLength = (int)move.path.count;
+            helper.baseMovement = move;
+            helper.position = move.position;
+            helper.heuristicValue = heuristic(helper);
+            [partialPaths addObject:helper];
+        } else {
+            [pointsConsidered addObject:[NSValue valueWithWorldPoint:move.position]];
+        }
+    }
+    
     NSComparisonResult (^prioritySorter)(id, id) = ^NSComparisonResult(id obj1, id obj2) {
-        int value1 = heuristic(obj1);
-        int value2 = heuristic(obj2);
+        int value1 = [obj1 heuristicValue];
+        int value2 = [obj2 heuristicValue];
         if (value1 > value2) {
             return NSOrderedAscending;
         } else if (value1 < value2) {
@@ -209,8 +221,11 @@
         WorldPoint right = (WorldPoint){current.x+1, current.y};
         WorldPoint newPoints[4] = {up, down, left, right};
         for (int i=0; i<4; i++) {
-            NSValue *nextPoint = [NSValue valueWithWorldPoint:newPoints[i]];
-            if (![pointsConsidered containsObject:nextPoint]) {
+            WorldPoint nextPoint = newPoints[i];
+            NSValue *pointValue = [NSValue valueWithWorldPoint:nextPoint];
+            TerrainMap *map = self.worldState.level.terrainTiles;
+            BOOL blocked = map[nextPoint.x][nextPoint.y].blocked;
+            if (![pointsConsidered containsObject:pointValue] && !blocked) {
                 WorldObject *object = [self.worldState objectAtPosition:newPoints[i]];
                 if ([object isKindOfClass:Character.class] &&
                     [(Character *)object team] == CharacterTeam_Player)
@@ -223,6 +238,7 @@
                     nextHelper.baseMovement = helper.baseMovement;
                     nextHelper.pathLength = helper.pathLength+1;
                     nextHelper.position = newPoints[i];
+                    nextHelper.heuristicValue = heuristic(nextHelper);
                     [partialPaths addObject:nextHelper];
                 }
             }
@@ -237,4 +253,10 @@
 @end
 
 @implementation PathfinderHelper
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"(%i, %i) - length %i - priority %i", self.position.x, self.position.y, self.pathLength, self.heuristicValue];
+}
+
 @end

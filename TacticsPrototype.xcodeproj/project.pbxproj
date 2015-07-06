@@ -16,6 +16,7 @@
 		3111B1EA1B3881F700F51534 /* WorldView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3111B1E91B3881F700F51534 /* WorldView.m */; };
 		314564CD1B43167900FCE0E5 /* CombatModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 314564CC1B43167900FCE0E5 /* CombatModel.m */; };
 		314564D01B48D00E00FCE0E5 /* EnemyAI.m in Sources */ = {isa = PBXBuildFile; fileRef = 314564CF1B48D00E00FCE0E5 /* EnemyAI.m */; };
+		314564D31B4AFEE600FCE0E5 /* LevelSetupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 314564D21B4AFEE600FCE0E5 /* LevelSetupViewController.m */; };
 		31493E551B38C577002D4380 /* PanelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 31493E541B38C577002D4380 /* PanelView.m */; };
 		31493E581B38D521002D4380 /* WorldState.m in Sources */ = {isa = PBXBuildFile; fileRef = 31493E571B38D521002D4380 /* WorldState.m */; };
 		31493E5B1B38D93D002D4380 /* WorldLevel.m in Sources */ = {isa = PBXBuildFile; fileRef = 31493E5A1B38D93D002D4380 /* WorldLevel.m */; };
@@ -66,6 +67,8 @@
 		314564CC1B43167900FCE0E5 /* CombatModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CombatModel.m; sourceTree = "<group>"; };
 		314564CE1B48D00E00FCE0E5 /* EnemyAI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnemyAI.h; sourceTree = "<group>"; };
 		314564CF1B48D00E00FCE0E5 /* EnemyAI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EnemyAI.m; sourceTree = "<group>"; };
+		314564D11B4AFEE600FCE0E5 /* LevelSetupViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LevelSetupViewController.h; sourceTree = "<group>"; };
+		314564D21B4AFEE600FCE0E5 /* LevelSetupViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LevelSetupViewController.m; sourceTree = "<group>"; };
 		31493E531B38C577002D4380 /* PanelView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PanelView.h; sourceTree = "<group>"; };
 		31493E541B38C577002D4380 /* PanelView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PanelView.m; sourceTree = "<group>"; };
 		31493E561B38D521002D4380 /* WorldState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldState.h; sourceTree = "<group>"; };
@@ -147,6 +150,8 @@
 			children = (
 				3111B1C31B387D3400F51534 /* AppDelegate.h */,
 				3111B1C41B387D3400F51534 /* AppDelegate.m */,
+				314564D11B4AFEE600FCE0E5 /* LevelSetupViewController.h */,
+				314564D21B4AFEE600FCE0E5 /* LevelSetupViewController.m */,
 				3111B1E51B3880A700F51534 /* WorldViewController.h */,
 				3111B1E61B3880A700F51534 /* WorldViewController.m */,
 				3111B1E81B3881F700F51534 /* WorldView.h */,
@@ -352,6 +357,7 @@
 				31493E581B38D521002D4380 /* WorldState.m in Sources */,
 				314564D01B48D00E00FCE0E5 /* EnemyAI.m in Sources */,
 				31493E5B1B38D93D002D4380 /* WorldLevel.m in Sources */,
+				314564D31B4AFEE600FCE0E5 /* LevelSetupViewController.m in Sources */,
 				31493E871B3CB66D002D4380 /* Weapon.m in Sources */,
 				31493E711B3A0045002D4380 /* ContentManager.m in Sources */,
 				31493E6E1B39FEDC002D4380 /* CharacterClass.m in Sources */,

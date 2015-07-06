@@ -48,11 +48,21 @@
 
 @implementation WorldViewController
 
+- (instancetype)initWithLevel:(WorldLevel *)level
+{
+    self = [super init];
+    if (self) {
+        self.worldLevel = level;
+    }
+    return self;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
     __weak typeof(self) weakSelf = self;
+    self.view.clipsToBounds = YES;
     self.view.backgroundColor = [UIColor blackColor];
     
     [self setupState];
@@ -84,8 +94,6 @@
 
 - (void)setupState
 {
-    self.worldLevel = [WorldLevel testLevel];
-    
     self.worldState = [[WorldState alloc] initWithLevel:self.worldLevel];
     self.worldState.gridCoordsEnabled = NO;
     self.worldState.gridLinesEnabled = YES;
@@ -450,7 +458,7 @@
 
 - (void)animateMoveFromAction:(EnemyAction *)action forAI:(EnemyAI *)enemyAI
 {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^
     {
         self.worldState.selectedObject = nil;
         [self.worldView updateGridForState:self.worldState];
@@ -510,7 +518,8 @@
     UIButton *linesButton = [[UIButton alloc] initWithFrame:buttonFrame];
     linesButton.titleLabel.numberOfLines = 0;
     linesButton.titleLabel.textAlignment = NSTextAlignmentCenter;
-    [linesButton setTitle:@"Hide Lines" forState:UIControlStateNormal];
+    NSString *title = self.worldState.gridLinesEnabled ? @"Hide Lines" : @"Show Lines";
+    [linesButton setTitle:title forState:UIControlStateNormal];
     [linesButton addTarget:self action:@selector(touchedGridLinesButton) forControlEvents:UIControlEventTouchUpInside];
     [menuPanel addSubview:linesButton];
     self.gridLinesButton = linesButton;
@@ -519,10 +528,19 @@
     UIButton *coordsButton = [[UIButton alloc] initWithFrame:buttonFrame];
     coordsButton.titleLabel.numberOfLines = 0;
     coordsButton.titleLabel.textAlignment = NSTextAlignmentCenter;
-    [coordsButton setTitle:@"Hide Coords" forState:UIControlStateNormal];
+    title = self.worldState.gridCoordsEnabled ? @"Hide Coords" : @"Show Coords";
+    [coordsButton setTitle:title forState:UIControlStateNormal];
     [coordsButton addTarget:self action:@selector(touchedCoordsButton) forControlEvents:UIControlEventTouchUpInside];
     [menuPanel addSubview:coordsButton];
     self.gridCoordsButton = coordsButton;
+    
+    buttonFrame.origin.y += buttonFrame.size.height;
+    UIButton *menuButton = [[UIButton alloc] initWithFrame:buttonFrame];
+    menuButton.titleLabel.numberOfLines = 0;
+    menuButton.titleLabel.textAlignment = NSTextAlignmentCenter;
+    [menuButton setTitle:@"Main Menu" forState:UIControlStateNormal];
+    [menuButton addTarget:self action:@selector(touchedMainMenuButton) forControlEvents:UIControlEventTouchUpInside];
+    [menuPanel addSubview:menuButton];
     
     [menuPanel setIsIn:NO animated:NO];
 }
@@ -543,6 +561,11 @@
 
     NSString *title = self.worldState.gridLinesEnabled ? @"Hide Lines" : @"Show Lines";
     [self.gridLinesButton setTitle:title forState:UIControlStateNormal];
+}
+
+- (void)touchedMainMenuButton
+{
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:NULL];
 }
 
 //----------------------------------------------------------------------------------

@@ -24,5 +24,6 @@
 @interface WorldLevel (TestLevel)
 
 + (WorldLevel *)testLevel;
++ (WorldLevel *)levelWithDimensions:(CGSize)dimensions numPlayers:(int)numPlayers numEnemies:(int)numEnemies;
 
 @end
