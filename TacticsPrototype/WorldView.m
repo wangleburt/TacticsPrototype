@@ -11,7 +11,10 @@
 #import "WorldState.h"
 #import "WorldObject.h"
 #import "CombatModel.h"
+
 #import "Character.h"
+#import "Weapon.h"
+#import "WeaponElement.h"
 
 #import "GridOverlayView.h"
 #import "GridOverlayDisplay.h"
@@ -80,6 +83,15 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
         sprite.center = spriteCenter(object.position);
         [self.sprites setObject:sprite forKey:object.key];
         [self.spriteView addSubview:sprite];
+        
+        if ([object isKindOfClass:Character.class]) {
+            WeaponElement *element = ((Character *)object).weapon.element;
+            UIImageView *elementIcon = [[UIImageView alloc] initWithFrame:(CGRect){3,3,10,10}];
+            elementIcon.backgroundColor = [UIColor clearColor];
+            elementIcon.contentMode = UIViewContentModeScaleAspectFit;
+            elementIcon.image = [UIImage imageNamed:element.iconFileName];
+            [sprite addSubview:elementIcon];
+        }
     }
 }
 

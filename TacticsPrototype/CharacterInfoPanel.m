@@ -9,11 +9,15 @@
 #import "CharacterInfoPanel.h"
 #import "Character.h"
 #import "CharacterClass.h"
+#import "Weapon.h"
+#import "WeaponElement.h"
 
 @interface CharacterInfoPanel ()
 
 @property (nonatomic, strong) UIImageView *portrait;
 @property (nonatomic, strong) UILabel *nameLabel;
+@property (nonatomic, strong) UIImageView *elementIcon;
+@property (nonatomic, strong) UILabel *elementLabel;
 @property (nonatomic, strong) UILabel *healthLabel;
 
 @property (nonatomic) CharacterTeam team;
@@ -39,27 +43,54 @@ static CGFloat const kShadowOffset = 3;
         [self addSubview:portrait];
         self.portrait = portrait;
         
-        CGRect healthFrame = (CGRect){CGPointZero, 115, 15};
-        healthFrame.origin.x = CGRectGetMaxX(portraitFrame) + 5;
-        healthFrame.origin.y = CGRectGetHeight(self.bounds) - healthFrame.size.height - 15 - kShadowOffset;
-        UILabel *healthLabel = [[UILabel alloc] initWithFrame:healthFrame];
-        healthLabel.backgroundColor = [UIColor clearColor];
-        healthLabel.textColor = [UIColor colorWithWhite:1 alpha:0.9];
-        healthLabel.font = [UIFont fontWithName:@"Helvetica" size:13];
-        healthLabel.minimumScaleFactor = 0.8;
-        healthLabel.adjustsFontSizeToFitWidth = YES;
-        [self addSubview:healthLabel];
-        self.healthLabel = healthLabel;
+        CGRect nameFrame = (CGRect){0, 13, 0, 15};
+        nameFrame.size.width = CGRectGetWidth(self.bounds) - CGRectGetWidth(portraitFrame) - 20;
+        nameFrame.origin.x = CGRectGetMaxX(portraitFrame) + 5;
+        UILabel *label = [[UILabel alloc] initWithFrame:nameFrame];
+        label.backgroundColor = [UIColor clearColor];
+        label.textColor = [UIColor colorWithWhite:1 alpha:0.9];
+        label.font = [UIFont fontWithName:@"Helvetica-Bold" size:15];
+        label.minimumScaleFactor = 0.8;
+        label.adjustsFontSizeToFitWidth = YES;
+        label.textAlignment = NSTextAlignmentLeft;
+        [self addSubview:label];
+        self.nameLabel = label;
         
-        CGRect nameFrame = CGRectOffset(healthFrame, 0, -healthFrame.size.height-2);
-        UILabel *nameLabel = [[UILabel alloc] initWithFrame:nameFrame];
-        nameLabel.backgroundColor = [UIColor clearColor];
-        nameLabel.textColor = [UIColor colorWithWhite:1 alpha:0.9];
-        nameLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:15];
-        nameLabel.minimumScaleFactor = 0.8;
-        nameLabel.adjustsFontSizeToFitWidth = YES;
-        [self addSubview:nameLabel];
-        self.nameLabel = nameLabel;
+        CGRect labelFrame = (CGRect){10, 0, 0, 15};
+        labelFrame.origin.y = CGRectGetMaxY(nameFrame) + 5;
+        labelFrame.origin.x = nameFrame.origin.x;
+        labelFrame.size.width = CGRectGetWidth(self.bounds) - labelFrame.origin.x - 5;
+        
+        CGRect elemIconFrame = (CGRect){CGPointZero, 20, 20};
+        elemIconFrame.origin.y = CGRectGetMidY(labelFrame) - CGRectGetHeight(elemIconFrame)/2;
+        elemIconFrame.origin.x = nameFrame.origin.x;
+        UIImageView *elementIcon = [[UIImageView alloc] initWithFrame:elemIconFrame];
+        elementIcon.backgroundColor = [UIColor clearColor];
+        elementIcon.contentMode = UIViewContentModeScaleAspectFit;
+        [self addSubview:elementIcon];
+        self.elementIcon = elementIcon;
+        
+        CGRect elemLabelFrame = labelFrame;
+        elemLabelFrame.size.width -= CGRectGetWidth(elemIconFrame) + 5;
+        elemLabelFrame.origin.x = CGRectGetMaxX(elemIconFrame) + 5;
+        label = [[UILabel alloc] initWithFrame:elemLabelFrame];
+        label.backgroundColor = [UIColor clearColor];
+        label.textColor = [UIColor colorWithWhite:1 alpha:0.9];
+        label.font = [UIFont fontWithName:@"Helvetica" size:13];
+        label.minimumScaleFactor = 0.8;
+        label.adjustsFontSizeToFitWidth = YES;
+        label.textAlignment = NSTextAlignmentLeft;
+        [self addSubview:label];
+        self.elementLabel = label;
+        
+        labelFrame.origin.y += CGRectGetHeight(labelFrame) + 5;
+        label = [[UILabel alloc] initWithFrame:labelFrame];
+        label.backgroundColor = [UIColor clearColor];
+        label.textColor = [UIColor colorWithWhite:1 alpha:0.9];
+        label.font = [UIFont fontWithName:@"Helvetica" size:13];
+        label.textAlignment = NSTextAlignmentLeft;
+        [self addSubview:label];
+        self.healthLabel = label;
     }
     return self;
 }
@@ -79,6 +110,8 @@ static CGFloat const kShadowOffset = 3;
     
     self.portrait.image = [UIImage imageNamed:character.characterClass.headImageFileName];
     self.nameLabel.text = character.characterClass.name;
+    self.elementLabel.text = character.weapon.element.name;
+    self.elementIcon.image = [UIImage imageNamed:character.weapon.element.iconFileName];
     self.healthLabel.text = [NSString stringWithFormat:@"Health: %i/%i", character.health, character.characterClass.maxHealth];
 }
 
@@ -121,6 +154,13 @@ static CGFloat const kShadowOffset = 3;
     portraitColor = [UIColor colorWithWhite:1 alpha:0.3];
     CGContextSetFillColorWithColor(context, portraitColor.CGColor);
     CGContextFillEllipseInRect(context, portraitRect);
+    
+    CGRect elemRect = CGRectOffset(self.elementIcon.frame, -1, -1);
+    elemRect.size.width += 1;
+    elemRect.size.height += 1;
+    shadowColor = [UIColor colorWithWhite:0 alpha:0.5];
+    CGContextSetFillColorWithColor(context, shadowColor.CGColor);
+    CGContextFillEllipseInRect(context, elemRect);
     
     CGFloat borderWidth = 2;
     CGContextSetLineWidth(context, borderWidth);
