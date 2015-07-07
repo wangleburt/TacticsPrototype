@@ -11,7 +11,20 @@
 
 #import "WorldLevel.h"
 
+@interface PresetPickerButton : UIButton
+
+@property (nonatomic) LevelPreset preset;
+@property (nonatomic) float maxWidth;
+@property (nonatomic) float maxHeight;
+
+@property (nonatomic) BOOL isSelectedPreset;
+
+@end
+
 @interface LevelSetupViewController ()
+
+@property (nonatomic, strong) NSArray *presetButtons;
+@property (nonatomic) LevelPreset currentPreset;
 
 @property (nonatomic, strong) UISlider *widthSlider;
 @property (nonatomic, strong) UILabel *widthLabel;
@@ -35,16 +48,45 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-    CGRect sliderFrame = (CGRect){20, 30, 0, 10};
+    CGRect presetFrame = (CGRect){0, 20, 100, 80};
+    PresetPickerButton *riversButton = [[PresetPickerButton alloc] initWithFrame:presetFrame];
+    [riversButton setImage:[UIImage imageNamed:@"map-rivers"] forState:UIControlStateNormal];
+    [riversButton addTarget:self action:@selector(touchedPresetButton:) forControlEvents:UIControlEventTouchUpInside];
+    riversButton.preset = LevelPreset_Rivers;
+    riversButton.maxWidth = 32;
+    riversButton.maxHeight = 16;
+    [self.view addSubview:riversButton];
+    
+    PresetPickerButton *plainsButton = [[PresetPickerButton alloc] initWithFrame:presetFrame];
+    [plainsButton setImage:[UIImage imageNamed:@"map-plains"] forState:UIControlStateNormal];
+    [plainsButton addTarget:self action:@selector(touchedPresetButton:) forControlEvents:UIControlEventTouchUpInside];
+    plainsButton.preset = LevelPreset_Plains;
+    plainsButton.maxWidth = 29;
+    plainsButton.maxHeight = 20;
+    [self.view addSubview:plainsButton];
+    
+    self.presetButtons = @[riversButton, plainsButton];
+    
+    CGFloat presetSpacing = 20;
+    CGFloat presetWidth = presetFrame.size.width*self.presetButtons.count;
+    presetWidth += presetSpacing * (self.presetButtons.count - 1);
+    CGFloat presetStartX = CGRectGetMidX(self.view.bounds) - presetWidth/2;
+    for (int i=0; i<self.presetButtons.count; i++) {
+        presetFrame.origin.x = presetStartX + i*(presetSpacing + presetFrame.size.width);
+        [self.presetButtons[i] setFrame:presetFrame];
+        [self.presetButtons[i] setIsSelectedPreset:NO];
+    }
+    
+    CGRect sliderFrame = (CGRect){20, 130, 0, 10};
     sliderFrame.size.width = (self.view.bounds.size.width - sliderFrame.origin.x*3)/2;
     
     UISlider *slider = [[UISlider alloc] initWithFrame:sliderFrame];
     [slider addTarget:self action:@selector(sliderUpdated:) forControlEvents:UIControlEventValueChanged];
     [slider setBackgroundColor:[UIColor clearColor]];
     slider.minimumValue = 5.0;
-    slider.maximumValue = 32.0;
+    slider.maximumValue = 29.0;
     slider.continuous = YES;
-    slider.value = 32.0;
+    slider.value = 29.0;
     [self.view addSubview:slider];
     self.widthSlider = slider;
     
@@ -62,9 +104,9 @@
     [slider addTarget:self action:@selector(sliderUpdated:) forControlEvents:UIControlEventValueChanged];
     [slider setBackgroundColor:[UIColor clearColor]];
     slider.minimumValue = 5.0;
-    slider.maximumValue = 16.0;
+    slider.maximumValue = 20.0;
     slider.continuous = YES;
-    slider.value = 16.0;
+    slider.value = 20.0;
     [self.view addSubview:slider];
     self.heightSlider = slider;
     
@@ -119,6 +161,8 @@
     [self sliderUpdated:self.playersSlider];
     [self sliderUpdated:self.enemiesSlider];
     
+    [self touchedPresetButton:riversButton];
+    
     CGRect buttonFrame = (CGRect){0, 300, 150, 50};
     buttonFrame.origin.x = CGRectGetMidX(self.view.bounds) - buttonFrame.size.width/2;
     UIButton *loadButton = [[UIButton alloc] initWithFrame:buttonFrame];
@@ -143,16 +187,65 @@
     }
 }
 
+- (void)touchedPresetButton:(PresetPickerButton *)presetButton
+{
+    self.currentPreset = presetButton.preset;
+    if (self.widthSlider.value > presetButton.maxWidth) {
+        self.widthSlider.value = presetButton.maxWidth;
+        [self sliderUpdated:self.widthSlider];
+    }
+    self.widthSlider.maximumValue = presetButton.maxWidth;
+    
+    if (self.heightSlider.value > presetButton.maxHeight) {
+        self.heightSlider.value = presetButton.maxHeight;
+        [self sliderUpdated:self.heightSlider];
+    }
+    self.heightSlider.maximumValue = presetButton.maxHeight;
+    
+    for (PresetPickerButton *button in self.presetButtons) {
+        button.isSelectedPreset = (button == presetButton);
+    }
+}
+
 - (void)touchedLoadLevel
 {
     CGSize size = (CGSize){floorf(self.widthSlider.value), floorf(self.heightSlider.value)};
     int numPlayers = floorf(self.playersSlider.value);
     int numEnemies = floorf(self.enemiesSlider.value);
     
-    WorldLevel *level = [WorldLevel levelWithDimensions:size numPlayers:numPlayers numEnemies:numEnemies];
+    WorldLevel *level = [WorldLevel levelWithDimensions:size numPlayers:numPlayers numEnemies:numEnemies levelPreset:self.currentPreset];
 
     WorldViewController *worldVC = [[WorldViewController alloc] initWithLevel:level];
     [self presentViewController:worldVC animated:YES completion:NULL];
+}
+
+@end
+
+@implementation PresetPickerButton
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        self.backgroundColor = [UIColor clearColor];
+        
+        self.imageView.contentMode = UIViewContentModeScaleAspectFill;
+        self.imageEdgeInsets = UIEdgeInsetsMake(10, 10, 10, 10);
+        
+        self.layer.borderWidth = 3;
+        self.layer.cornerRadius = 5;
+    }
+    return self;
+}
+
+- (void)setIsSelectedPreset:(BOOL)isSelectedPreset
+{
+    _isSelectedPreset = isSelectedPreset;
+    if (isSelectedPreset) {
+        self.layer.borderColor = [UIColor blackColor].CGColor;
+    } else {
+        self.layer.borderColor = [UIColor clearColor].CGColor;
+    }
 }
 
 @end

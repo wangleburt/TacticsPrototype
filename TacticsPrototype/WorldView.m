@@ -46,10 +46,10 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
         self.backgroundColor = [UIColor redColor];
         self.level = level;
         
-        CGRect bgFrame = (CGRect){CGPointZero, kWorldGridUnitSize * 32, kWorldGridUnitSize * 16};
+        CGRect bgFrame = (CGRect){CGPointZero, kWorldGridUnitSize * level.nativeMapSize.width, kWorldGridUnitSize * level.nativeMapSize.height};
         UIImageView *backgroundView = [[UIImageView alloc] initWithFrame:bgFrame];
         backgroundView.image = [UIImage imageNamed:level.mapImageFileName];
-        backgroundView.contentMode = UIViewContentModeScaleToFill;
+        backgroundView.contentMode = UIViewContentModeScaleAspectFill;
         [self addSubview:backgroundView];
         self.backgroundView = backgroundView;
         

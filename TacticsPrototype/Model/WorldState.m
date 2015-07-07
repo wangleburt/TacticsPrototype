@@ -183,6 +183,8 @@
 - (GridOverlayDisplay *)currentGridOverlayDisplay
 {
     GridOverlayDisplay *display = [[GridOverlayDisplay alloc] initWithWorldState:self];
+    
+    
     if (self.characterWorldOptions) {
         for (CharacterMovementOption *option in self.characterWorldOptions.moveOptions) {
             if (self.characterWorldOptions.character.team == CharacterTeam_Player) {
@@ -200,7 +202,7 @@
         }
     }
 
-/********** UNCOMMENT TO HIGHLIGHT BLOCKED TILES ************/
+///********** UNCOMMENT TO HIGHLIGHT BLOCKED TILES ************/
 //    for (int i=0; i<self.gridDimensions.width; i++) {
 //        for (int j=0; j<self.gridDimensions.height; j++) {
 //            if (self.level.terrainTiles[i][j].blocked) {

@@ -16,6 +16,8 @@
 @interface WorldLevel ()
 
 @property (nonatomic) CGSize levelSize;
+@property (nonatomic) CGSize nativeMapSize;
+
 @property (nonatomic, strong) NSString *mapImageFileName;
 @property (nonatomic, strong) TerrainMap *terrainTiles;
 @property (nonatomic, strong) NSArray *characters;
@@ -28,97 +30,13 @@
 
 @implementation WorldLevel (TestLevel)
 
-+ (WorldLevel *)testLevel
-{
-    WorldLevel *level = [[WorldLevel alloc] init];
-    level.levelSize = CGSizeMake(32, 16);
-    level.mapImageFileName = @"map32x16";
-
-    [self setupTerrainForLevel:level];
-    
-    NSMutableArray *characters = [NSMutableArray array];
-    Character *dude = [[Character alloc] init];
-    dude.characterClass = [ContentManager contentWithKey:@"class_footman"];
-    dude.position = (WorldPoint){2, 2};
-    dude.team = CharacterTeam_Player;
-    dude.key = @"foot1";
-    dude.weapon = [[Weapon alloc] init];
-    dude.weapon.damage = 4;
-    dude.weapon.element = [ContentManager contentWithKey:@"element_earth"];
-    [characters addObject:dude];
-    
-    dude = [[Character alloc] init];
-    dude.characterClass = [ContentManager contentWithKey:@"class_footman"];
-    dude.position = (WorldPoint){3, 3};
-    dude.team = CharacterTeam_Player;
-    dude.key = @"foot2";
-    dude.weapon = [[Weapon alloc] init];
-    dude.weapon.damage = 4;
-    dude.weapon.element = [ContentManager contentWithKey:@"element_water"];
-    [characters addObject:dude];
-    
-    dude = [[Character alloc] init];
-    dude.characterClass = [ContentManager contentWithKey:@"class_archer"];
-    dude.position = (WorldPoint){1, 1};
-    dude.team = CharacterTeam_Player;
-    dude.key = @"archer1";
-    dude.weapon = [[Weapon alloc] init];
-    dude.weapon.damage = 4;
-    dude.weapon.element = [ContentManager contentWithKey:@"element_fire"];
-    [characters addObject:dude];
-    
-    dude = [[Character alloc] init];
-    dude.characterClass = [ContentManager contentWithKey:@"class_archer"];
-    dude.position = (WorldPoint){2, 1};
-    dude.team = CharacterTeam_Player;
-    dude.key = @"archer2";
-    dude.weapon = [[Weapon alloc] init];
-    dude.weapon.damage = 4;
-    dude.weapon.element = [ContentManager contentWithKey:@"element_earth"];
-    [characters addObject:dude];
-    
-    dude = [[Character alloc] init];
-    dude.characterClass = [ContentManager contentWithKey:@"class_grunt"];
-    dude.position = (WorldPoint){4, 2};
-    dude.team = CharacterTeam_Enemy;
-    dude.key = @"grunt1";
-    dude.weapon = [[Weapon alloc] init];
-    dude.weapon.damage = 5;
-    dude.weapon.element = [ContentManager contentWithKey:@"element_none"];
-    [characters addObject:dude];
-    
-    dude = [[Character alloc] init];
-    dude.characterClass = [ContentManager contentWithKey:@"class_grunt"];
-    dude.position = (WorldPoint){9, 1};
-    dude.team = CharacterTeam_Enemy;
-    dude.key = @"grunt2";
-    dude.weapon = [[Weapon alloc] init];
-    dude.weapon.damage = 5;
-    dude.weapon.element = [ContentManager contentWithKey:@"element_none"];
-    [characters addObject:dude];
-    
-    dude = [[Character alloc] init];
-    dude.characterClass = [ContentManager contentWithKey:@"class_grunt"];
-    dude.position = (WorldPoint){10, 0};
-    dude.team = CharacterTeam_Enemy;
-    dude.key = @"grunt3";
-    dude.weapon = [[Weapon alloc] init];
-    dude.weapon.damage = 5;
-    dude.weapon.element = [ContentManager contentWithKey:@"element_none"];
-    [characters addObject:dude];
-    
-    level.characters = characters;
-    
-    return level;
-}
-
-+ (WorldLevel *)levelWithDimensions:(CGSize)dimensions numPlayers:(int)numPlayers numEnemies:(int)numEnemies
++ (WorldLevel *)levelWithDimensions:(CGSize)dimensions numPlayers:(int)numPlayers numEnemies:(int)numEnemies levelPreset:(LevelPreset)levelPreset
 {
     WorldLevel *level = [[WorldLevel alloc] init];
     level.levelSize = dimensions;
-    level.mapImageFileName = @"map32x16";
+    
 
-    [self setupTerrainForLevel:level];
+    [self setupTerrainForLevel:level levelPreset:levelPreset];
 
     NSMutableArray *characters = [NSMutableArray array];
     NSArray *elements = @[[ContentManager contentWithKey:@"element_earth"],
@@ -182,35 +100,66 @@
     return level;
 }
 
-+ (void)setupTerrainForLevel:(WorldLevel *)level
++ (void)setupTerrainForLevel:(WorldLevel *)level levelPreset:(LevelPreset)levelPreset
 {
+    CGSize terrainSize;
+    NSString *terrain;
+    
+    switch (levelPreset) {
+        case LevelPreset_Rivers:
+            level.mapImageFileName = @"map-rivers";
+            terrainSize = (CGSize){32,16};
+            terrain =
+               @"NNNNNNYYNYYYYYYYYNNNYYYYYYYYYYYY"
+                "NYYNNYYYYYYYYYYYYYYNNNNYYYYYYYYY"
+                "YYYYYYYYNNYYYYYYYYYNNNNNNNNYYYYY"
+                "YYYYYYYYYNNNYYYYYYYNNNNYYYNNYYYY"
+                "NNYYYYYYYNYNNYYYNNNNNNNYYYYNYYNN"
+                "YNNNNYYYYNYYYYYYYYYNNNNYYYYYYYYY"
+                "YYYYNNNNNNYYNNYYYYYYYNYNNNYYYYYY"
+                "YYYYYYYNNNYYYNYYYYYYYYYYYYYYYYYY"
+                "YYYYYYYYNNNNYNYYYYYYYNYYYYYYYYYY"
+                "YYYYYYYYYYYNYNYYYYYYYNNNYYYYYYYY"
+                "YYYYYYYYYYYYYNNYYYYYYYNNNYYYYYYY"
+                "YYYYYYYYYYYNNYNYYYYYYYNYYYYYYYYY"
+                "YYYYYYYYYYYYNNNNYYYYYNNYYYYYYYYY"
+                "YYYYYYYYYYYYYYNNYYYYNNYYYYYYYYYY"
+                "YYYYYYYYYYYYYYNNYYYYYYYYYYYYYYYY"
+                "YYYYYYYYYYYYYYYNNYYYNYYYYYYYYYYY";
+            break;
+        
+        case LevelPreset_Plains:
+            level.mapImageFileName = @"map-plains";
+            terrainSize = (CGSize){29,20};
+            terrain =
+               @"YYYYYYYYYYYYYYYYYYYYNNNNNNNNN"
+                "YYYYYYYYYYYYYYYYYYYNNNNNNNNNN"
+                "YYYYYYYYYYYYYYYYYYYNNNNNNNNNN"
+                "YYYYYYYYYYYYYYYYYYYYNNNNNNNNN"
+                "YYYYYYYYYYYYYYYYYYYYNNNNNNNNN"
+                "YYNYYYYYYYYYYYYYYYYYYNNNNNNNN"
+                "YNYYYYYYYYYYYYYYYYYYYYYNNNNNN"
+                "NYYYYYYYYYYYYYYYYYYYYYNNNNNNN"
+                "YYYYYYYYYYYYYYYYYYYYNNNYYNNNN"
+                "YYYYYYYYYYYYYYYYYYYNNYYYYNNNN"
+                "YYYYYYYYYYYYYYYYYYNYYYYYYNNNN"
+                "YYYYYYYYYYYYYYYYYYYNYYYYYYNNN"
+                "YYYYYYYYYYYYYYYYYYYYYYYYYYYNN"
+                "YYYYYYYYYYYYYYYYYYYYYYYYYYYNN"
+                "YYYYYYYYYYYYYYYYYYYNNYYYYYYNN"
+                "YYYYYYYYYYYYYYYYYYYNNYYYYYNNN"
+                "YYYYYYYYYYNNNYYYYYYNNYYYYNNNN"
+                "YYYYYYYYYYNNNYYYYYYYYYYYYNNNN"
+                "YYYYYYYYYYNYNYYYYYYYYYYNNNNNN"
+                "YYYYYYYYYYYYYYYYYYYYYYYNNNNNN";
+            break;
+    }
+
+    level.nativeMapSize = terrainSize;
     level.terrainTiles = [[TerrainMap alloc] initWithDimensions:level.levelSize];
-    NSString *terrain =
-       @"NNNNNNYYNYYYYYYYYNNNYYYYYYYYYYYY"
-        "NYYNNYYYYYYYYYYYYYYNNNNYYYYYYYYY"
-        "YYYYYYYYNNYYYYYYYYYNNNNNNNNYYYYY"
-        "YYYYYYYYYNNNYYYYYYYNNNNYYYNNYYYY"
-        "NNYYYYYYYNYNNYYYNNNNNNNYYYYNYYNN"
-        "YNNNNYYYYNYYYYYYYYYNNNNYYYYYYYYY"
-        "YYYYNNNNNNYYNNYYYYYYYNYNNNYYYYYY"
-        "YYYYYYYNNNYYYNYYYYYYYYYYYYYYYYYY"
-        "YYYYYYYYNNNNYNYYYYYYYNYYYYYYYYYY"
-        "YYYYYYYYYYYNYNYYYYYYYNNNYYYYYYYY"
-        "YYYYYYYYYYYYYNNYYYYYYYNNNYYYYYYY"
-        "YYYYYYYYYYYNNYNYYYYYYYNYYYYYYYYY"
-        "YYYYYYYYYYYYNNNNYYYYYNNYYYYYYYYY"
-        "YYYYYYYYYYYYYYNNYYYYNNYYYYYYYYYY"
-        "YYYYYYYYYYYYYYNNYYYYYYYYYYYYYYYY"
-        "YYYYYYYYYYYYYYYNNYYYNYYYYYYYYYYY";
-    for (int y=0; y<16; y++) {
-        if (y >= level.levelSize.height) {
-            continue;
-        }
-        for (int x=0; x<32; x++) {
-            if (x >= level.levelSize.width) {
-                continue;
-            }
-            char type = [terrain characterAtIndex:y*32+x];
+    for (int y=0; y<terrainSize.height && y<level.levelSize.height; y++) {
+        for (int x=0; x<terrainSize.width && x<level.levelSize.width; x++) {
+            char type = [terrain characterAtIndex:y*terrainSize.width+x];
             if (type == 'N') {
                 level.terrainTiles[x][y] = [TerrainTile blockedTile];
             } else {
