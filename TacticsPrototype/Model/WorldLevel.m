@@ -153,6 +153,60 @@
                 "YYYYYYYYYYNYNYYYYYYYYYYNNNNNN"
                 "YYYYYYYYYYYYYYYYYYYYYYYNNNNNN";
             break;
+        
+        case LevelPreset_Valley:
+            level.mapImageFileName = @"map-valley";
+            terrainSize = (CGSize){28,16};
+            terrain =
+               @"YYYYYNNNNNNNNNNNNNNNNNNNNNYY"
+                "YNNNYNNNNNNNNNNNNNNNNNNNYYYY"
+                "YNNNYYNNNNNNNNNNNNNNNNNNYYYY"
+                "YNYNYYNNNNNNNNNNYNNNNNNYYYYY"
+                "YYYYYYYNNNNNNNYYYNNNNNYYYYYY"
+                "YYYYYYYNNNNNNNYYYNNNNNYYYYYY"
+                "YYYYYYYYYYYYYYYYYNNNNNYYYYYY"
+                "YYYYYYYYYYYYYYYYYYNNNNYYYYNY"
+                "YYYYYYYYYYYYYYYYYYNYYYYYYYNY"
+                "YYYYYYYYYYYYYYYYYYYYYYYYYYNN"
+                "YYYYYYYYYYYYYYYYYYYYYYYNYYYY"
+                "YYYYYYYYYYNNNNNNYYYYYYYYNYYY"
+                "YYYYYYYYYNNNNNNNYYYYYYYYYYYY"
+                "YYYYYYYYNNNNNNNNNYYYYYYYYYYY"
+                "YYYYYYNNNNNNNNNNNNNNYYYYYYYY"
+                "YYYYYNNNNNNNNNNNNNNNNYYYYYYY";
+            break;
+        
+        case LevelPreset_Cross:
+            level.mapImageFileName = @"map-cross";
+            terrainSize = (CGSize){22,26};
+            terrain =
+               @"NNNYYYNNNYYNNNNYYYYYYY"
+                "NNNYYYNNNYYYNNNYYYYYYY"
+                "NYNYYYNYNYYNNNNYYYNNNN"
+                "YYYYYYYYYYYNNNYYYNNNNN"
+                "YYYYYYYYYYNNYYYYNNNNNN"
+                "YYYYYYYYYYYYYYYYYYYYYN"
+                "YYYYYYYYYYYYYYYYYYYYYY"
+                "YYYYYYYYYYNYYYYYYYYYYY"
+                "NYYYYNYYYYNNYYYYYYYYYY"
+                "NNNYYNYYYYYNNYYYYYYYYY"
+                "NNNYYYNYYYYYNYYYYYNYYY"
+                "NNNYYYYNYYYNNNNYYYNYYY"
+                "NNNNYYYYNYNNNNYNNNYYYY"
+                "NNNYYYYNNNNNNNYYYYYYYY"
+                "NNNNYYNNNNNNYYYYYYYNYY"
+                "NNNNYYYYYYYYYNNYYYNYYY"
+                "NNNNYYYYYYYYYYNYYNYYYY"
+                "NNYYYYYYYYYYYYNYNYYYYY"
+                "YYYYYYYYYYYYYNNYNYYYYY"
+                "YYYYYYYYYYYYNNYYYYYYYY"
+                "YYYYYYYYYYYYNYYYNYYYYY"
+                "YYYYYYYYYYYYNYYYNYYYYY"
+                "YYYYYYYYYYYYNYYYYNYYYY"
+                "YYYYYYYYYYYYYYYYYNNNYY"
+                "YYYYYYYYYYYNNYYYYYYYYY"
+                "YYYYYYYYYYYNYYYYYYYYYY";
+            break;
     }
 
     level.nativeMapSize = terrainSize;

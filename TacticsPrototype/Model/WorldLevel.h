@@ -24,7 +24,9 @@
 
 typedef enum {
     LevelPreset_Rivers,
-    LevelPreset_Plains
+    LevelPreset_Plains,
+    LevelPreset_Valley,
+    LevelPreset_Cross
 } LevelPreset;
 
 @interface WorldLevel (TestLevel)

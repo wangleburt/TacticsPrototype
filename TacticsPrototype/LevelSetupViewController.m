@@ -65,7 +65,23 @@
     plainsButton.maxHeight = 20;
     [self.view addSubview:plainsButton];
     
-    self.presetButtons = @[riversButton, plainsButton];
+    PresetPickerButton *valleyButton = [[PresetPickerButton alloc] initWithFrame:presetFrame];
+    [valleyButton setImage:[UIImage imageNamed:@"map-valley"] forState:UIControlStateNormal];
+    [valleyButton addTarget:self action:@selector(touchedPresetButton:) forControlEvents:UIControlEventTouchUpInside];
+    valleyButton.preset = LevelPreset_Valley;
+    valleyButton.maxWidth = 28;
+    valleyButton.maxHeight = 16;
+    [self.view addSubview:valleyButton];
+    
+    PresetPickerButton *crossButton = [[PresetPickerButton alloc] initWithFrame:presetFrame];
+    [crossButton setImage:[UIImage imageNamed:@"map-cross"] forState:UIControlStateNormal];
+    [crossButton addTarget:self action:@selector(touchedPresetButton:) forControlEvents:UIControlEventTouchUpInside];
+    crossButton.preset = LevelPreset_Cross;
+    crossButton.maxWidth = 22;
+    crossButton.maxHeight = 26;
+    [self.view addSubview:crossButton];
+    
+    self.presetButtons = @[riversButton, plainsButton, valleyButton, crossButton];
     
     CGFloat presetSpacing = 20;
     CGFloat presetWidth = presetFrame.size.width*self.presetButtons.count;
