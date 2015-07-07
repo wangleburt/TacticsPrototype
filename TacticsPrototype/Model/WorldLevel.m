@@ -90,7 +90,7 @@
         dude.team = CharacterTeam_Enemy;
         dude.key = [NSString stringWithFormat:@"enemy%i", i+1];
         dude.weapon = [[Weapon alloc] init];
-        dude.weapon.damage = 4;
+        dude.weapon.damage = 3;
         dude.weapon.element = elements[arc4random()%3];
         [characters addObject:dude];
     }

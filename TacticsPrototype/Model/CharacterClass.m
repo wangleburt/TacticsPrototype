@@ -44,7 +44,7 @@
     grunt.headImageFileName = @"grunt-head";
     grunt.attackRangeMin = 1;
     grunt.attackRangeMax = 1;
-    grunt.maxHealth = 15;
+    grunt.maxHealth = 10;
     [contentManager setContent:grunt forKey:@"class_grunt"];
     
     CharacterClass *archer = [[CharacterClass alloc] init];
