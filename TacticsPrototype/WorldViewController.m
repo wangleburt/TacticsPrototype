@@ -175,6 +175,9 @@
 - (void)scrollToRect:(CGRect)rect completion:(void (^)())completionBlock
 {
     CGRect visibleRect = self.worldScrollView.bounds;
+    rect.origin.x *= self.worldScrollView.zoomScale;
+    rect.origin.y *= self.worldScrollView.zoomScale;
+    
     if (CGRectContainsRect(visibleRect, rect)) {
         if (completionBlock) {
             completionBlock();
