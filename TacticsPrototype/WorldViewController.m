@@ -323,7 +323,7 @@
 - (void)presentAttackOption:(CharacterAttackOption *)attack onTarget:(Character *)target
 {
     CharacterWorldOptions *options = self.worldState.characterWorldOptions;
-    int range = WorldPointRangeToPoint(attack.moveOption.position, attack.position);
+    int range = WorldPointRangeToPoint(options.selectedMoveOption.position, attack.position);
     CombatPreview *preview = [[CombatPreview alloc] initWithPlayer:options.character andEnemy:target range:range];
     [self.combatPreview updateWithCombatPreview:preview];
     self.combatPreview.hidden = NO;
