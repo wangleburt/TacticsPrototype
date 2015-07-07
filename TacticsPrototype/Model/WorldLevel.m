@@ -42,6 +42,12 @@
     NSArray *elements = @[[ContentManager contentWithKey:@"element_earth"],
                           [ContentManager contentWithKey:@"element_water"],
                           [ContentManager contentWithKey:@"element_fire"]];
+    NSMutableArray *elementDump = [NSMutableArray arrayWithArray:elements];
+    NSArray *classOrder = @[@"class_footman",
+                            @"class_footman",
+                            @"class_archer",
+                            @"class_mage",
+                            @"class_footman"];
     
     NSMutableArray *positions = [NSMutableArray array];
     int maxY = (numPlayers > 15) ? 5 : 4;
@@ -59,17 +65,28 @@
         [positions removeObject:position];
         
         Character *dude = [[Character alloc] init];
-        NSString *classKey = ((i+1) % 3 == 0) ? @"class_archer" : @"class_footman";
+        NSString *classKey = classOrder[i % classOrder.count];
         dude.characterClass = [ContentManager contentWithKey:classKey];
         dude.position = [position worldPointValue];
         dude.team = CharacterTeam_Player;
         dude.key = [NSString stringWithFormat:@"player%i", i+1];
         dude.weapon = [[Weapon alloc] init];
         dude.weapon.damage = 4;
-        dude.weapon.element = elements[arc4random()%3];
+        if (elementDump.count == 0) {
+            [elementDump addObjectsFromArray:elements];
+        }
+        WeaponElement *element = elementDump[arc4random()%elementDump.count];
+        [elementDump removeObject:element];
+        dude.weapon.element = element;
         [characters addObject:dude];
     }
     
+    
+    classOrder = @[@"class_grunt",
+                   @"class_grunt",
+                   @"class_goblin",
+                   @"class_shaman",
+                   @"class_grunt"];
     [positions removeAllObjects];
     for (int x=0; x<dimensions.width; x++) {
         for (int y=0; y<dimensions.height; y++) {
@@ -85,13 +102,19 @@
         [positions removeObject:position];
     
         Character *dude = [[Character alloc] init];
-        dude.characterClass = [ContentManager contentWithKey:@"class_grunt"];
+        NSString *classKey = classOrder[i % classOrder.count];
+        dude.characterClass = [ContentManager contentWithKey:classKey];
         dude.position = [position worldPointValue];
         dude.team = CharacterTeam_Enemy;
         dude.key = [NSString stringWithFormat:@"enemy%i", i+1];
         dude.weapon = [[Weapon alloc] init];
         dude.weapon.damage = 3;
-        dude.weapon.element = elements[arc4random()%3];
+        if (elementDump.count == 0) {
+            [elementDump addObjectsFromArray:elements];
+        }
+        WeaponElement *element = elementDump[arc4random()%elementDump.count];
+        [elementDump removeObject:element];
+        dude.weapon.element = element;
         [characters addObject:dude];
     }
 

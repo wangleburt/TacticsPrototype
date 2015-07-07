@@ -37,16 +37,6 @@
     footman.maxHealth = 10;
     [contentManager setContent:footman forKey:@"class_footman"];
     
-    CharacterClass *grunt = [[CharacterClass alloc] init];
-    grunt.movement = 3;
-    grunt.name = @"Grunt";
-    grunt.idleImageFileName = @"grunt-idle";
-    grunt.headImageFileName = @"grunt-head";
-    grunt.attackRangeMin = 1;
-    grunt.attackRangeMax = 1;
-    grunt.maxHealth = 10;
-    [contentManager setContent:grunt forKey:@"class_grunt"];
-    
     CharacterClass *archer = [[CharacterClass alloc] init];
     archer.movement = 4;
     archer.name = @"Archer";
@@ -56,6 +46,48 @@
     archer.attackRangeMax = 2;
     archer.maxHealth = 6;
     [contentManager setContent:archer forKey:@"class_archer"];
+    
+    CharacterClass *mage = [[CharacterClass alloc] init];
+    mage.movement = 4;
+    mage.name = @"Mage";
+    mage.idleImageFileName = @"mage-idle";
+    mage.headImageFileName = @"mage-head";
+    mage.attackRangeMin = 1;
+    mage.attackRangeMax = 2;
+    mage.maxHealth = 6;
+    [contentManager setContent:mage forKey:@"class_mage"];
+
+
+
+    CharacterClass *grunt = [[CharacterClass alloc] init];
+    grunt.movement = 3;
+    grunt.name = @"Grunt";
+    grunt.idleImageFileName = @"grunt-idle";
+    grunt.headImageFileName = @"grunt-head";
+    grunt.attackRangeMin = 1;
+    grunt.attackRangeMax = 1;
+    grunt.maxHealth = 10;
+    [contentManager setContent:grunt forKey:@"class_grunt"];
+
+    CharacterClass *goblin = [[CharacterClass alloc] init];
+    goblin.movement = 3;
+    goblin.name = @"Goblin";
+    goblin.idleImageFileName = @"goblin-idle";
+    goblin.headImageFileName = @"goblin-head";
+    goblin.attackRangeMin = 2;
+    goblin.attackRangeMax = 2;
+    goblin.maxHealth = 6;
+    [contentManager setContent:goblin forKey:@"class_goblin"];
+
+    CharacterClass *shaman = [[CharacterClass alloc] init];
+    shaman.movement = 3;
+    shaman.name = @"Shaman";
+    shaman.idleImageFileName = @"shaman-idle";
+    shaman.headImageFileName = @"shaman-head";
+    shaman.attackRangeMin = 1;
+    shaman.attackRangeMax = 2;
+    shaman.maxHealth = 6;
+    [contentManager setContent:shaman forKey:@"class_shaman"];
 }
 
 @end
