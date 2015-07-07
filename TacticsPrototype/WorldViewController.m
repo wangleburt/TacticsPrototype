@@ -155,16 +155,43 @@
     titleImage.image = [UIImage imageNamed:turnImageName];
     [self.view addSubview:titleImage];
     
+    CGRect coverFrame = self.view.bounds;
+    coverFrame.size.height /= 2;
+    coverFrame.size.height -= 75;
+    UIView *topView = [[UIView alloc] initWithFrame:coverFrame];
+    topView.backgroundColor = [UIColor blackColor];
+    topView.alpha = 0;
+    topView.transform = CGAffineTransformMakeTranslation(0, -coverFrame.size.height);
+    [self.view addSubview:topView];
+    
+    coverFrame.origin.y = CGRectGetMaxY(self.view.bounds) - CGRectGetHeight(coverFrame);
+    UIView *bottomView = [[UIView alloc] initWithFrame:coverFrame];
+    bottomView.backgroundColor = [UIColor blackColor];
+    bottomView.alpha = 0;
+    bottomView.transform = CGAffineTransformMakeTranslation(0, coverFrame.size.height);
+    [self.view addSubview:bottomView];
+    
     [UIView animateWithDuration:0.3f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
         CGRect frame = imageRect;
         frame.origin.x = 0;
         titleImage.frame = frame;
+        topView.alpha = 0.4;
+        topView.transform = CGAffineTransformIdentity;
+        bottomView.alpha = 0.4;
+        bottomView.transform = CGAffineTransformIdentity;
     } completion:^(BOOL finished) {
         [UIView animateWithDuration:0.3f delay:0.3f options:UIViewAnimationOptionCurveEaseIn animations:^{
             CGRect frame = imageRect;
             frame.origin.x = -frame.size.width;
             titleImage.frame = frame;
+            topView.alpha = 0;
+            topView.transform = CGAffineTransformMakeTranslation(0, -coverFrame.size.height);
+            bottomView.alpha = 0;
+            bottomView.transform = CGAffineTransformMakeTranslation(0, coverFrame.size.height);
         } completion:^(BOOL finished) {
+            [titleImage removeFromSuperview];
+            [topView removeFromSuperview];
+            [bottomView removeFromSuperview];
             if (completionBlock) {
                 completionBlock();
             }
