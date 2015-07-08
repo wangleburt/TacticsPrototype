@@ -9,6 +9,7 @@
 #import "CharacterInfoPanel.h"
 #import "Character.h"
 #import "CharacterClass.h"
+#import "CharacterStats.h"
 #import "Weapon.h"
 #import "WeaponElement.h"
 
@@ -112,7 +113,7 @@ static CGFloat const kShadowOffset = 3;
     self.nameLabel.text = character.characterClass.name;
     self.elementLabel.text = character.weapon.element.name;
     self.elementIcon.image = [UIImage imageNamed:character.weapon.element.iconFileName];
-    self.healthLabel.text = [NSString stringWithFormat:@"Health: %i/%i", character.health, character.characterClass.maxHealth];
+    self.healthLabel.text = [NSString stringWithFormat:@"Health: %i/%i", character.health, character.stats.maxHp];
 }
 
 - (void)drawRect:(CGRect)rect

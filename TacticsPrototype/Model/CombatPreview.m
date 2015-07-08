@@ -9,6 +9,7 @@
 #import "CombatPreview.h"
 #import "Character.h"
 #import "CharacterClass.h"
+#import "CharacterStats.h"
 #import "Weapon.h"
 #import "WeaponElement.h"
 
@@ -45,27 +46,25 @@
     
     AttackPreveiw *attack = [[AttackPreveiw alloc] init];
     
-    int baseDamage = attacker.weapon.damage;
-    // TODO: modify base damage with atk/def, magic/res
+    int pDmg = MAX(0, attacker.stats.str - defender.stats.armor);
+    int mDmg = MAX(0, attacker.stats.magic - defender.stats.res);
+    int damage = pDmg + mDmg;
     
-    int baseHit = 70;
-    // TODO: modify base hit with acc/dodge
+    int baseHit = 70 + attacker.stats.acc - defender.stats.dodge;
 
     ElementComparison comp = [attacker.weapon.element compareAgainstElement:defender.weapon.element];
     if (comp == ElementComparison_Advantage) {
-        attack.damage = baseDamage * 1.5;
+        attack.damage = MAX(3, damage * 1.5);
         attack.hitChance = MAX(0, MIN(100, baseHit * 1.5));
     } else if (comp == ElementComparison_Disadvantage) {
-        attack.damage = baseDamage * 0.6;
+        attack.damage = damage * 0.6;
         attack.hitChance = MAX(0, MIN(100, baseHit * 0.6));
     } else {
-        attack.damage = baseDamage;
-        attack.hitChance = baseHit;
+        attack.damage = damage;
+        attack.hitChance = MAX(0, MIN(100, baseHit));
     }
     
-    int baseCrit = 5;
-    // TODO: modify crit with stats
-    attack.critChance = baseCrit;
+    attack.critChance = attacker.stats.critChance;
     
     return attack;
 }

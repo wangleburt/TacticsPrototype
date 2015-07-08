@@ -11,6 +11,7 @@
 
 #import "Character.h"
 #import "CharacterClass.h"
+#import "CharacterStats.h"
 #import "CombatPreview.h"
 #import "Weapon.h"
 #import "WeaponElement.h"
@@ -382,7 +383,7 @@
 {
     self.portrait.image = [UIImage imageNamed:character.characterClass.headImageFileName];
     self.nameLabel.text = character.characterClass.name;
-    self.healthLabel.text = [NSString stringWithFormat:@"%i/%i", character.health, character.characterClass.maxHealth];
+    self.healthLabel.text = [NSString stringWithFormat:@"%i/%i", character.health, character.stats.maxHp];
     WeaponElement *element = character.weapon.element;
     self.elementLabel.text = element.name;
     self.elementIcon.image = [UIImage imageNamed:element.iconFileName];

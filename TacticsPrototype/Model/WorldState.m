@@ -15,6 +15,7 @@
 #import "WorldObject.h"
 #import "Character.h"
 #import "CharacterClass.h"
+#import "CharacterStats.h"
 #import "CharacterWorldOptions.h"
 #import "CombatModel.h"
 #import "EnemyAI.h"
@@ -67,7 +68,8 @@
         } else if (dude.team == CharacterTeam_Enemy) {
             [self.enemyCharacters addObject:dude];
         }
-        dude.health = dude.characterClass.maxHealth;
+        [dude setupStats];
+        dude.health = dude.stats.maxHp;
     }
 }
 

@@ -47,7 +47,7 @@
                             @"class_footman",
                             @"class_archer",
                             @"class_mage",
-                            @"class_footman"];
+                            @"class_ninja"];
     
     NSMutableArray *positions = [NSMutableArray array];
     int maxY = (numPlayers > 15) ? 5 : 4;

@@ -8,6 +8,7 @@
 
 #import "CombatModel.h"
 #import "CombatPreview.h"
+#import "CharacterStats.h"
 
 #import "Character.h"
 
@@ -45,7 +46,7 @@
             int critChance = arc4random() % 101;
             if (critChance <= preview.critChance) {
                 attackModel.roll = AttackRoll_Crit;
-                attackModel.damage = preview.damage * 2;
+                attackModel.damage = preview.damage * (1+attacker.stats.critDmg/100);
             } else {
                 attackModel.roll = AttackRoll_Hit;
                 attackModel.damage = preview.damage;

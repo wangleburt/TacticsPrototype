@@ -36,6 +36,7 @@
 		31493E8D1B3DE682002D4380 /* CharacterInfoPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 31493E8C1B3DE682002D4380 /* CharacterInfoPanel.m */; };
 		31493E901B41F64D002D4380 /* CombatPreview.m in Sources */ = {isa = PBXBuildFile; fileRef = 31493E8F1B41F64D002D4380 /* CombatPreview.m */; };
 		31493E931B420AC7002D4380 /* CombatPreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = 31493E921B420AC7002D4380 /* CombatPreviewView.m */; };
+		317795ED1B4C88D50055068C /* CharacterStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 317795EC1B4C88D50055068C /* CharacterStats.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -107,6 +108,8 @@
 		31493E8F1B41F64D002D4380 /* CombatPreview.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CombatPreview.m; sourceTree = "<group>"; };
 		31493E911B420AC7002D4380 /* CombatPreviewView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CombatPreviewView.h; sourceTree = "<group>"; };
 		31493E921B420AC7002D4380 /* CombatPreviewView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CombatPreviewView.m; sourceTree = "<group>"; };
+		317795EB1B4C88D50055068C /* CharacterStats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CharacterStats.h; sourceTree = "<group>"; };
+		317795EC1B4C88D50055068C /* CharacterStats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CharacterStats.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -223,6 +226,8 @@
 				31493E791B3A03DA002D4380 /* WorldObject.m */,
 				31493E751B3A03C6002D4380 /* Character.h */,
 				31493E761B3A03C6002D4380 /* Character.m */,
+				317795EB1B4C88D50055068C /* CharacterStats.h */,
+				317795EC1B4C88D50055068C /* CharacterStats.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -354,6 +359,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				317795ED1B4C88D50055068C /* CharacterStats.m in Sources */,
 				31493E581B38D521002D4380 /* WorldState.m in Sources */,
 				314564D01B48D00E00FCE0E5 /* EnemyAI.m in Sources */,
 				31493E5B1B38D93D002D4380 /* WorldLevel.m in Sources */,
