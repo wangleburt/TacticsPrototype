@@ -14,6 +14,4 @@
 
 @property (nonatomic, strong) WeaponElement *element;
 
-@property (nonatomic) int damage;
-
 @end

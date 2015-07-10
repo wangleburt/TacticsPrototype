@@ -15,7 +15,7 @@
 @property (nonatomic, readonly) int atk;
 @property (nonatomic, readonly) int str;
 @property (nonatomic, readonly) int magic;
-@property (nonatomic, readonly) int critDmg;
+@property (nonatomic, readonly) float critDmg;
 
 @property (nonatomic, readonly) int def;
 @property (nonatomic, readonly) int armor;
@@ -26,6 +26,8 @@
 @property (nonatomic, readonly) int acc;
 @property (nonatomic, readonly) int dodge;
 @property (nonatomic, readonly) int critChance;
+
+@property (nonatomic, readonly) float baseDamage;
 
 - (instancetype)initWithAtk:(float)atk def:(float)def skill:(float)skill;
 - (void)updateWithClass:(CharacterClass *)characterClass;

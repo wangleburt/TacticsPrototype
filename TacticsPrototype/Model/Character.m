@@ -29,9 +29,9 @@
 
 - (void)setupStats
 {
-    self.atk = 10 + self.characterClass.atkPerLevel*20;
-    self.def = 10 + self.characterClass.defPerLevel*20;
-    self.skill = 10 + self.characterClass.skillPerLevel*20;
+    self.atk = 10 + self.characterClass.atkPerLevel*self.level;
+    self.def = 10 + self.characterClass.defPerLevel*self.level;
+    self.skill = 10 + self.characterClass.skillPerLevel*self.level;
 
     self.stats = [[CharacterStats alloc] initWithAtk:self.atk def:self.def skill:self.skill];
     [self.stats updateWithClass:self.characterClass];

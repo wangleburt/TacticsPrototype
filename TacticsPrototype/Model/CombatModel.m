@@ -46,7 +46,7 @@
             int critChance = arc4random() % 101;
             if (critChance <= preview.critChance) {
                 attackModel.roll = AttackRoll_Crit;
-                attackModel.damage = preview.damage * (1+attacker.stats.critDmg/100);
+                attackModel.damage = preview.damage * (attacker.stats.critDmg);
             } else {
                 attackModel.roll = AttackRoll_Hit;
                 attackModel.damage = preview.damage;

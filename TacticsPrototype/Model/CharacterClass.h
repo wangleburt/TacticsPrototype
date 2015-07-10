@@ -8,6 +8,12 @@
 
 #import "WorldContent.h"
 
+typedef enum AttackType {
+    AttackType_Physical,
+    AttackType_Magical,
+    AttackType_Both
+} AttackType;
+
 @interface CharacterClass : WorldContent
 
 @property (nonatomic, strong, readonly) NSString *name;
@@ -16,14 +22,19 @@
 
 @property (nonatomic, readonly) NSUInteger movement;
 
+@property (nonatomic, readonly) AttackType attackType;
 @property (nonatomic, readonly) int attackRangeMin;
 @property (nonatomic, readonly) int attackRangeMax;
 
 // stats
+@property (nonatomic, readonly) float baseDamage;
+@property (nonatomic, readonly) float baseDamagePerLevel;
+
 @property (nonatomic, readonly) float atkPerLevel;
 @property (nonatomic, readonly) float strPerAtk;
 @property (nonatomic, readonly) float magicPerAtk;
 @property (nonatomic, readonly) float critDmgPerAtk;
+@property (nonatomic, readonly) float critDmgBase;
 
 @property (nonatomic, readonly) float defPerLevel;
 @property (nonatomic, readonly) float armorPerDef;
@@ -34,5 +45,6 @@
 @property (nonatomic, readonly) float accPerSkill;
 @property (nonatomic, readonly) float dodgePerSkill;
 @property (nonatomic, readonly) float critChancePerSkill;
+@property (nonatomic, readonly) float critChanceBase;
 
 @end

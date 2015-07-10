@@ -46,19 +46,27 @@
     
     AttackPreveiw *attack = [[AttackPreveiw alloc] init];
     
-    int pDmg = MAX(0, attacker.stats.str - defender.stats.armor);
-    int mDmg = MAX(0, attacker.stats.magic - defender.stats.res);
-    int damage = pDmg + mDmg;
+    float bDmg = attacker.characterClass.baseDamage + attacker.characterClass.baseDamagePerLevel * attacker.level;
+    float pDmg = bDmg + (1.0/3.0) * (attacker.stats.str - defender.stats.armor);
+    float mDmg = bDmg + (1.0/3.0) * (attacker.stats.magic - defender.stats.res);
+    int damage = 0;
+    if (attacker.characterClass.attackType == AttackType_Physical) {
+        damage = MAX(0, floorf(pDmg));
+    } else if (attacker.characterClass.attackType == AttackType_Magical) {
+        damage = MAX(0, floorf(mDmg));
+    } else if (attacker.characterClass.attackType == AttackType_Both) {
+        damage = MAX(0, floorf(pDmg/2)) + MAX(0, floorf(mDmg/2));
+    }
     
     int baseHit = 70 + attacker.stats.acc - defender.stats.dodge;
 
     ElementComparison comp = [attacker.weapon.element compareAgainstElement:defender.weapon.element];
     if (comp == ElementComparison_Advantage) {
-        attack.damage = MAX(3, damage * 1.5);
+        attack.damage = MAX(3, damage + attacker.level/3);
         attack.hitChance = MAX(0, MIN(100, baseHit * 1.5));
     } else if (comp == ElementComparison_Disadvantage) {
-        attack.damage = damage * 0.6;
-        attack.hitChance = MAX(0, MIN(100, baseHit * 0.6));
+        attack.damage = MAX(0, damage - attacker.level/3);
+        attack.hitChance = MAX(0, MIN(100, baseHit * 0.5));
     } else {
         attack.damage = damage;
         attack.hitChance = MAX(0, MIN(100, baseHit));

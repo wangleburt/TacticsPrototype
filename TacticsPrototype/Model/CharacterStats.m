@@ -14,7 +14,7 @@
 @property (nonatomic) int atk;
 @property (nonatomic) int str;
 @property (nonatomic) int magic;
-@property (nonatomic) int critDmg;
+@property (nonatomic) float critDmg;
 
 @property (nonatomic) int def;
 @property (nonatomic) int armor;
@@ -25,6 +25,8 @@
 @property (nonatomic) int acc;
 @property (nonatomic) int dodge;
 @property (nonatomic) int critChance;
+
+@property (nonatomic) float baseDamage;
 
 @end
 
@@ -45,7 +47,7 @@
 {
     self.str = self.atk*characterClass.strPerAtk;
     self.magic = self.atk*characterClass.magicPerAtk;
-    self.critDmg = self.atk*characterClass.critDmgPerAtk;
+    self.critDmg = self.atk*characterClass.critDmgPerAtk + characterClass.critDmgBase;
     
     self.armor = self.def*characterClass.armorPerDef;
     self.res = self.def*characterClass.resPerDef;
@@ -53,7 +55,7 @@
     
     self.acc = self.skill*characterClass.accPerSkill;
     self.dodge = self.skill*characterClass.dodgePerSkill;
-    self.critChance = self.skill*characterClass.critChancePerSkill;
+    self.critChance = self.skill*characterClass.critChancePerSkill + characterClass.critChanceBase;
 }
 
 @end

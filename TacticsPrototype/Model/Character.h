@@ -19,8 +19,7 @@ typedef enum {
 
 @interface Character : WorldObject
 
-@property (nonatomic) NSUInteger movesRemaining;
-
+@property (nonatomic) int level;
 @property (nonatomic, strong) CharacterClass *characterClass;
 @property (nonatomic) CharacterTeam team;
 @property (nonatomic, strong) Weapon *weapon;
@@ -28,6 +27,7 @@ typedef enum {
 
 @property (nonatomic) int health;
 @property (nonatomic) int isActive;
+@property (nonatomic) NSUInteger movesRemaining;
 
 - (void)setupStats;
 

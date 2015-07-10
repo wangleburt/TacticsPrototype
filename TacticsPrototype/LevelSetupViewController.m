@@ -160,7 +160,7 @@
     slider.minimumValue = 1.0;
     slider.maximumValue = 100.0;
     slider.continuous = YES;
-    slider.value = 5.0;
+    slider.value = 12.0;
     [self.view addSubview:slider];
     self.enemiesSlider = slider;
     
@@ -177,7 +177,7 @@
     [self sliderUpdated:self.playersSlider];
     [self sliderUpdated:self.enemiesSlider];
     
-    [self touchedPresetButton:riversButton];
+    [self touchedPresetButton:plainsButton];
     
     CGRect buttonFrame = (CGRect){0, 300, 150, 50};
     buttonFrame.origin.x = CGRectGetMidX(self.view.bounds) - buttonFrame.size.width/2;
