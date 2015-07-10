@@ -320,7 +320,7 @@ static CGFloat const kWorldGridUnitSize = 80.0f;
     }
     
     CGPoint center = sprite.center;
-    center.y -= kWorldGridUnitSize / 2;
+    center.y = MAX(kWorldGridUnitSize, center.y - kWorldGridUnitSize/2);
     label.center = center;
     
     [self.spriteView addSubview:label];

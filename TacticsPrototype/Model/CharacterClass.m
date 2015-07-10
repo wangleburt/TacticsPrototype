@@ -176,16 +176,16 @@
     dude.baseDamagePerLevel = 0.25;
     
     dude.atkPerLevel = 1.25;
-    dude.defPerLevel = 0.5;
+    dude.defPerLevel = 0.75;
     dude.skillPerLevel = 1.25;
     
     dude.strPerAtk = .6;
     dude.magicPerAtk = 0;
     dude.critDmgBase = 2.5;
     dude.critDmgPerAtk = 0.0143;
-    dude.armorPerDef = 1.2;
-    dude.resPerDef = 1.2;
-    dude.maxHpPerDef = 0.9;
+    dude.armorPerDef = .96;
+    dude.resPerDef = 0.96;
+    dude.maxHpPerDef = 0.72;
     dude.accPerSkill = 1.286;
     dude.dodgePerSkill = 1.286;
     dude.critChancePerSkill = 0.15;

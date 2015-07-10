@@ -48,7 +48,7 @@
 //                            @"class_archer",
 //                            @"class_mage",
 //                            @"class_thief"];
-    NSArray *classOrder = @[@"class_soldier"];
+    NSArray *classOrder = @[@"class_mage"];
     
     NSMutableArray *positions = [NSMutableArray array];
 //    int maxY = (numPlayers > 15) ? 5 : 4;
