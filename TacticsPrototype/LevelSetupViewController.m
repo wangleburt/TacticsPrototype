@@ -205,7 +205,7 @@
 
 - (void)touchedPresetButton:(PresetPickerButton *)presetButton
 {
-    self.currentPreset = presetButton.preset;
+    self.currentPreset = presetButton.preset; 
     if (self.widthSlider.value > presetButton.maxWidth) {
         self.widthSlider.value = presetButton.maxWidth;
         [self sliderUpdated:self.widthSlider];
