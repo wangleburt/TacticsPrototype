@@ -160,7 +160,7 @@
     slider.minimumValue = 1.0;
     slider.maximumValue = 100.0;
     slider.continuous = YES;
-    slider.value = 12.0;
+    slider.value = 15.0;
     [self.view addSubview:slider];
     self.enemiesSlider = slider;
     
@@ -230,6 +230,8 @@
     int numEnemies = floorf(self.enemiesSlider.value);
     
     WorldLevel *level = [WorldLevel levelWithDimensions:size numPlayers:numPlayers numEnemies:numEnemies levelPreset:self.currentPreset];
+
+//    WorldLevel *level = [WorldLevel testLevel];
 
     WorldViewController *worldVC = [[WorldViewController alloc] initWithLevel:level];
     [self presentViewController:worldVC animated:YES completion:NULL];

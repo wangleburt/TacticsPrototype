@@ -33,4 +33,6 @@ typedef enum {
 
 + (WorldLevel *)levelWithDimensions:(CGSize)dimensions numPlayers:(int)numPlayers numEnemies:(int)numEnemies levelPreset:(LevelPreset)levelPreset;
 
++ (WorldLevel *)testLevel;
+
 @end

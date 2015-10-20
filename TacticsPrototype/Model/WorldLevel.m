@@ -30,6 +30,78 @@
 
 @implementation WorldLevel (TestLevel)
 
++ (WorldLevel *)testLevel
+{
+    WorldLevel *level = [[WorldLevel alloc] init];
+    level.levelSize = (CGSize){29,20};
+    [self setupTerrainForLevel:level levelPreset:LevelPreset_Plains];
+
+    NSMutableArray *characters = [NSMutableArray array];
+
+    Character *player = [[Character alloc] init];
+    player.characterClass = [ContentManager contentWithKey:@"class_mage"];
+    player.position = (WorldPoint){3,2};
+    player.team = CharacterTeam_Player;
+    player.level = 1;
+    player.key = @"player1";
+    player.weapon = [[Weapon alloc] init];
+    player.weapon.element = [ContentManager contentWithKey:@"element_fire"];
+    [characters addObject:player];
+    
+    NSArray *classOrder = @[@"class_soldier", @"class_soldier", @"class_soldier",
+                            @"class_archer",  @"class_archer",  @"class_archer",
+                            @"class_mage",    @"class_mage",    @"class_mage",
+                            @"class_thief",   @"class_thief",   @"class_thief"];
+
+    NSMutableArray *positions = [NSMutableArray array];
+    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){1,1}]];
+    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){1,2}]];
+    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){1,3}]];
+
+    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){2,4}]];
+    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){3,4}]];
+    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){4,4}]];
+
+    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){5,1}]];
+    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){5,2}]];
+    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){5,3}]];
+
+    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){2,0}]];
+    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){3,0}]];
+    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){4,0}]];
+
+    NSArray *elements = @[[ContentManager contentWithKey:@"element_earth"],
+                          [ContentManager contentWithKey:@"element_water"],
+                          [ContentManager contentWithKey:@"element_fire"]];
+    NSMutableArray *elementDump = [NSMutableArray arrayWithArray:elements];
+    
+    
+    for (int i=0; i<classOrder.count && positions.count > 0; i++) {
+        NSValue *position = positions[0];
+        [positions removeObject:position];
+    
+        Character *dude = [[Character alloc] init];
+        NSString *classKey = classOrder[i % classOrder.count];
+        dude.characterClass = [ContentManager contentWithKey:classKey];
+        dude.position = [position worldPointValue];
+        dude.team = CharacterTeam_Enemy;
+        dude.level = 1;
+        dude.key = [NSString stringWithFormat:@"enemy%i", i+1];
+        dude.weapon = [[Weapon alloc] init];
+        if (elementDump.count == 0) {
+            [elementDump addObjectsFromArray:elements];
+        }
+        WeaponElement *element = elementDump[arc4random()%elementDump.count];
+        [elementDump removeObject:element];
+        dude.weapon.element = element;
+        [characters addObject:dude];
+    }
+
+    level.characters = characters;
+
+    return level;
+}
+
 + (WorldLevel *)levelWithDimensions:(CGSize)dimensions numPlayers:(int)numPlayers numEnemies:(int)numEnemies levelPreset:(LevelPreset)levelPreset
 {
     WorldLevel *level = [[WorldLevel alloc] init];
@@ -43,25 +115,23 @@
                           [ContentManager contentWithKey:@"element_water"],
                           [ContentManager contentWithKey:@"element_fire"]];
     NSMutableArray *elementDump = [NSMutableArray arrayWithArray:elements];
-//    NSArray *classOrder = @[@"class_soldier",
-//                            @"class_soldier",
-//                            @"class_archer",
-//                            @"class_mage",
-//                            @"class_thief"];
-    NSArray *classOrder = @[@"class_mage"];
+    NSArray *classOrder = @[@"class_soldier",
+                            @"class_soldier",
+                            @"class_archer",
+                            @"class_mage",
+                            @"class_thief"];
     
     NSMutableArray *positions = [NSMutableArray array];
-//    int maxY = (numPlayers > 15) ? 5 : 4;
-//    int maxX = (numPlayers > 10) ? 7 : 6;
-//    for (int x=0; x<maxX; x++) {
-//        for (int y=0; y<maxY; y++) {
-//            if (!level.terrainTiles[x][y].blocked) {
-//                WorldPoint point = (WorldPoint){x, y};
-//                [positions addObject:[NSValue valueWithWorldPoint:point]];
-//            }
-//        }
-//    }
-    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){3,2}]];
+    int maxY = (numPlayers > 15) ? 5 : 4;
+    int maxX = (numPlayers > 10) ? 7 : 6;
+    for (int x=0; x<maxX; x++) {
+        for (int y=0; y<maxY; y++) {
+            if (!level.terrainTiles[x][y].blocked) {
+                WorldPoint point = (WorldPoint){x, y};
+                [positions addObject:[NSValue valueWithWorldPoint:point]];
+            }
+        }
+    }
 
     for (int i=0; i<numPlayers && positions.count > 0; i++) {
         NSValue *position = positions[arc4random() % positions.count];
@@ -85,56 +155,26 @@
     }
     
     
-//    classOrder = @[@"class_grunt",
-//                   @"class_grunt",
-//                   @"class_goblin",
-//                   @"class_shaman",
-//                   @"class_grunt"];
-    classOrder = @[@"class_soldier",
-                   @"class_soldier",
-                   @"class_soldier",
-                   @"class_archer",
-                   @"class_archer",
-                   @"class_archer",
-                   @"class_mage",
-                   @"class_mage",
-                   @"class_mage",
-                   @"class_thief",
-                   @"class_thief",
-                   @"class_thief"];
+    classOrder = @[@"class_grunt",
+                   @"class_grunt",
+                   @"class_goblin",
+                   @"class_shaman",
+                   @"class_rogue"];
     [positions removeAllObjects];
-//    for (int x=0; x<dimensions.width; x++) {
-//        for (int y=0; y<dimensions.height; y++) {
-//            if ((x > maxX || y > maxY) &&
-//                !level.terrainTiles[x][y].blocked) {
-//                WorldPoint point = (WorldPoint){x, y};
-//                [positions addObject:[NSValue valueWithWorldPoint:point]];
-//            }
-//        }
-//    }
-    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){1,1}]];
-    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){1,2}]];
-    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){1,3}]];
-
-    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){2,4}]];
-    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){3,4}]];
-    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){4,4}]];
-
-    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){5,1}]];
-    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){5,2}]];
-    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){5,3}]];
-
-    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){2,0}]];
-    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){3,0}]];
-    [positions addObject:[NSValue valueWithWorldPoint:(WorldPoint){4,0}]];
-
-
+    for (int x=0; x<dimensions.width; x++) {
+        for (int y=0; y<dimensions.height; y++) {
+            if ((x > maxX || y > maxY) &&
+                !level.terrainTiles[x][y].blocked) {
+                WorldPoint point = (WorldPoint){x, y};
+                [positions addObject:[NSValue valueWithWorldPoint:point]];
+            }
+        }
+    }
     [elementDump removeAllObjects];
     
     
     for (int i=0; i<numEnemies && positions.count > 0; i++) {
-//        NSValue *position = positions[arc4random() % positions.count];
-        NSValue *position = positions[0];
+        NSValue *position = positions[arc4random() % positions.count];
         [positions removeObject:position];
     
         Character *dude = [[Character alloc] init];

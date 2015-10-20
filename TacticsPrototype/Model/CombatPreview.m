@@ -62,11 +62,11 @@
 
     ElementComparison comp = [attacker.weapon.element compareAgainstElement:defender.weapon.element];
     if (comp == ElementComparison_Advantage) {
-        int elementBonus = 2 + attacker.level/4;
+        int elementBonus = 2 + attacker.level/5;
         attack.damage = MAX(3, damage + elementBonus);
         attack.hitChance = MAX(0, MIN(100, baseHit * 1.5));
     } else if (comp == ElementComparison_Disadvantage) {
-        int elementPenalty = 2 + defender.level/4;
+        int elementPenalty = 2 + defender.level/5;
         attack.damage = MAX(0, damage - elementPenalty);
         attack.hitChance = MAX(0, MIN(100, baseHit * 0.5));
     } else {
